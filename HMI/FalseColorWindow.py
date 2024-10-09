@@ -10,16 +10,15 @@ class FalseColorWindow(tk.Toplevel):
         self.geometry("800x600")
 
         # Widgets
-        ttk.Label(self, text="False Color Simulation", font=("Arial", 20)).pack(pady=20)
-        
-        # Create an image label to display the image
-        self.image_label = tk.Label(self, text="Display False Color Image Here", font=("Arial", 16))
-        self.image_label.pack(pady=20)
+        self._create_widgets()
 
         # Simulate Image
         self.simulate_image()
 
-        # Return Home Button
+    def _create_widgets(self):
+        ttk.Label(self, text="False Color Simulation", font=("Arial", 20)).pack(pady=20)
+        self.image_label = tk.Label(self, text="Display False Color Image Here", font=("Arial", 16))
+        self.image_label.pack(pady=20)
         home_btn = ttk.Button(self, text="Home", command=self.return_home)
         home_btn.pack(pady=10)
 
