@@ -8,13 +8,14 @@ class ImageMS (Image):
     Author : Lakhdar Gibril
     """
 
-    def __init__(self, name : str, start_wavelength : int, end_wavelength : int, reels : list) : 
+    def __init__(self, name : str, start_wavelength : int, end_wavelength : int, size : tuple, reels : list) : 
         """
         Natural constructor of the class ImageMS
         args : 
             - name : the image name as a string (with the path)
             - start_wavelength : an integer which represent the start wavelength of the multispectral image
             - end_wavelength : an integer which represent the end wavelength of the multispectral image
+            - size : a tuple with the height and width of the image
             - reels : represent the list of reels in the image
 
         Author : Lakhdar Gibril
@@ -79,6 +80,14 @@ class ImageMS (Image):
         Author : Lakhdar Gibril
         """
         return self.__reels
+    
+    def get_size(self) -> tuple : 
+        """
+        Getter which allow to get the size of the image
+        @return : the size of the image as a tuple
+
+        Author : Lakhdar Gibril
+        """
 
     def next_reel(self) -> None : 
         """
@@ -90,7 +99,6 @@ class ImageMS (Image):
         if current_index < len(self.__reels) - 1:
             self.__current = self.__reels[current_index + 1]
         else:
-            # Si on est au dernier reel, on revient au premier
             self.__current = self.__reels[0]
         
 
@@ -104,5 +112,4 @@ class ImageMS (Image):
         if current_index > 0:
             self.__current = self.__reels[current_index - 1]
         else:
-            # Si on est au premier reel, on va au dernier
             self.__current = self.__reels[-1]
