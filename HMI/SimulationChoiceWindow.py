@@ -1,9 +1,5 @@
 import tkinter as tk
 from tkinter import ttk
-from HMI.TrueColorWindow import TrueColorWindow
-from HMI.FalseColorWindow import FalseColorWindow
-from HMI.DaltonismWindow import DaltonismWindow
-from HMI.BeeColorWindow import BeeColorWindow
 
 class SimulationChoiceWindow(tk.Toplevel):
     """
@@ -30,9 +26,9 @@ class SimulationChoiceWindow(tk.Toplevel):
         self.title("Select Simulation Method")
         self.geometry("400x300")
 
-        self.__create_widgets()
+        self.__initialize_widgets()
 
-    def __create_widgets (self) -> None : 
+    def __initialize_widgets (self) -> None : 
         # Dropdown for selecting simulation
         self.sim_type = tk.StringVar(self)
         self.sim_type.set("True Color")  # Set "True Color" as the default selection
@@ -42,24 +38,7 @@ class SimulationChoiceWindow(tk.Toplevel):
         ttk.OptionMenu(self, self.sim_type, "True Color", *sim_options).pack(pady=10)  # Ensure "True Color" is always displayed
 
         # Proceed Button
-        proceed_btn = ttk.Button(self, text="Proceed", command=self.proceed)
+        proceed_btn = ttk.Button(self, text="Proceed", command=self.__proceed)
         proceed_btn.pack(pady=10)
 
-    def proceed(self) -> None:
-        sim_type = self.sim_type.get()
-        print(f"Selected simulation type: {sim_type}")  # Debugging line
-        if self.image_path is None:
-            print("No image path provided!")  # Debugging line
-            return  # Exit if no image path is available
-        if sim_type == "True Color":
-            print("Opening True Color Window...")  # Debugging line
-            TrueColorWindow(self, self.image_path)  # Pass image_path to TrueColorWindow
-        elif sim_type == "False Color":
-            print("Opening False Color Window...")  # Debugging line
-            FalseColorWindow(self, self.image_path)  # Pass image_path to FalseColorWindow
-        elif sim_type == "Daltonism Simulation":
-            print("Opening Daltonism Window...")  # Debugging line
-            DaltonismWindow(self, self.image_path)  # Pass image_path to DaltonismWindow
-        elif sim_type == "Bee Color Simulation":
-            print("Opening Bee Color Window...")  # Debugging line
-            BeeColorWindow(self, self.image_path)  # Pass image_path to BeeColorWindow
+    
