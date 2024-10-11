@@ -118,7 +118,7 @@ class MainWindow(tk.Tk):
                 # Enable the simulation buttons
                 self.sim_btn.config(state='normal')  # Enable the button after image import
             except Exception as e:
-                print(f"Error loading image: {e}")  # Print error message to console
+                print(f"Error loading image: {e}. line : {e.__traceback__.tb_lineno}")  # Print error message to console
                 self.image_label.config(text="Error loading image")  # Update label to show error
         else:
             self.image_label.config(text="No Image")  # Reset label if no image is selected

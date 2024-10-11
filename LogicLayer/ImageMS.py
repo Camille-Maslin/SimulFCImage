@@ -80,18 +80,29 @@ class ImageMS (Image):
         """
         return self.__reels
 
-    def next_reel(self) -> None :
+    def next_reel(self) -> None : 
         """
         Method which allow to switch to the next reel of the image and update the actual reel
 
-        Author : 
+        Author : Alexandre Moreau
         """ 
-        pass
+        current_index = self.__reels.index(self.__current)
+        if current_index < len(self.__reels) - 1:
+            self.__current = self.__reels[current_index + 1]
+        else:
+            # Si on est au dernier reel, on revient au premier
+            self.__current = self.__reels[0]
+        
 
     def previous_reel(self) -> None : 
         """
         Method which allow to switch to the previous reel of the image and update the actual reel
 
-        Author : 
+        Author : Alexandre Moreau
         """
-        pass
+        current_index = self.__reels.index(self.__current)
+        if current_index > 0:
+            self.__current = self.__reels[current_index - 1]
+        else:
+            # Si on est au premier reel, on va au dernier
+            self.__current = self.__reels[-1]
