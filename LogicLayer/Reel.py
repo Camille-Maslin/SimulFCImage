@@ -1,3 +1,5 @@
+import numpy as np
+
 class Reel : 
     """
     Class Reel which represent the reel of a multispecral image 
@@ -5,7 +7,7 @@ class Reel :
     Author : Lakhdar Gibril
     """
 
-    def __init__(self, shade_of_grey : int, wave_length : tuple) : 
+    def __init__(self, shade_of_grey : np.ndarray, wave_length : tuple) : 
         """
         Natural constructor of the class Reel
         args : 
@@ -17,7 +19,7 @@ class Reel :
         self.__shade_of_grey = shade_of_grey
         self.__wave_length = wave_length
 
-    def get_shade_of_grey (self) -> int :
+    def get_shade_of_grey (self) -> np.ndarray :
         """
         Getter which allow to get the value of the shade of grey 
         @return : the shade of grey as an integer
@@ -25,17 +27,6 @@ class Reel :
         Author : Lakhdar Gibril
         """ 
         return self.__shade_of_grey
-
-    def set_shade_of_grey (self, value : int) -> None : 
-        """
-        Setter which allow to set a new value for the shade of grey
-        args : 
-            - value : the value between 0 and 255 for the new shade of grey
-
-        Author : Lakhdar Gibril
-        """
-        assert(value >= 0 and value <= 255 )
-        self.__shade_of_grey = value
 
 
     def get_wavelength (self) -> tuple : 

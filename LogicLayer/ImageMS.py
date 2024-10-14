@@ -1,7 +1,7 @@
 from PIL import Image
-import Reel
+from LogicLayer.Reel import Reel
 
-class ImageMS (Image): 
+class ImageMS (Image.Image) : 
     """
     Class ImageMS which represent a multispectral image and which inherit of the Image class
 
@@ -20,10 +20,12 @@ class ImageMS (Image):
 
         Author : Lakhdar Gibril
         """
+        super().__init__
         self.__path = name 
         self.__start_wavelength = start_wavelength
         self.__end_wavelength = end_wavelength
         self.__reels = reels
+        self.__size = size
         self.__current = self.__reels[0] # Represent the current reel
 
     def get_name(self) -> str : 
@@ -33,7 +35,7 @@ class ImageMS (Image):
 
         Author : Lakhdar Gibril
         """
-        return self.__path 
+        return self.__path.split("/")[-1] 
     
     def get_start_wavelength(self) -> int : 
         """
@@ -81,6 +83,15 @@ class ImageMS (Image):
         """
         return self.__reels
     
+    def get_number_reels(self) -> int : 
+        """
+        Getter which allow to get the number of reels of the image 
+        @return : an interger of the number of reels
+
+        Author : Lakhdar Gibril
+        """
+        return len(self.__reels)
+    
     def get_size(self) -> tuple : 
         """
         Getter which allow to get the size of the image
@@ -88,6 +99,16 @@ class ImageMS (Image):
 
         Author : Lakhdar Gibril
         """
+        return self.__size
+
+    def get_path (self) -> str : 
+        """
+        Getter which allow to get the path of the image
+        @return : the path as a string of the image 
+        Author : Lakhdar Gibril
+        """
+        return self.__path
+
 
     def next_reel(self) -> None : 
         """

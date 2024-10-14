@@ -1,5 +1,5 @@
-import LogicLayer.Reel
-import LogicLayer.ImageMS
+from LogicLayer.Reel import Reel
+from LogicLayer.ImageMS import ImageMS
 
 class ImageManager : 
     """
@@ -18,7 +18,7 @@ class ImageManager :
         pass 
 
     @staticmethod
-    def create_reel_instance(data : list) -> LogicLayer.Reel : 
+    def create_reel_instance(data : list) -> Reel : 
         """
         Method which allow to create a Reel class instance thanks to data found in the multispectral image
         args : 
@@ -26,10 +26,11 @@ class ImageManager :
 
         Author : Lakhdar Gibril
         """
-        pass 
+        reel = Reel(data[0],data[1])
+        return reel  
 
     @staticmethod
-    def create_imagems_instance(data : list) -> LogicLayer.ImageMS : 
+    def create_imagems_instance(data : list) -> ImageMS : 
         """
         Method which allow to create a ImageMS class instance thanks to data found in the multispectral image
         args : 
@@ -37,4 +38,5 @@ class ImageManager :
 
         Author : Lakhdar Gibril
         """
-        pass 
+        image = ImageMS(data[0],data[1],data[2],data[3],data[4])
+        return image 

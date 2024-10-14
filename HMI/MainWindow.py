@@ -1,7 +1,9 @@
 import tkinter as tk
 from tkinter import ttk, filedialog
 from PIL import Image, ImageTk  # Import PIL for image handling
-import os
+import matplotlib.pyplot as plt
+import matplotlib.image as img 
+from Storage.FileManager import FileManager
 from HMI.SimulationChoiceWindow import SimulationChoiceWindow  # Ensure this import is present
 
 class MainWindow(tk.Tk):
@@ -16,7 +18,7 @@ class MainWindow(tk.Tk):
         Constructor of the class MainWindow, where you can configure the different widgets and the 
         window parameters.
 
-        Author :  
+        Author :  Lakhdar Gibril
         """
         # Calling the parent constructor of the Tk class.
         super().__init__()
@@ -91,29 +93,28 @@ class MainWindow(tk.Tk):
         self.image_label.config(image=self.img)  # Update the image_label to display the image
         self.image_sim_label.config(image=self.img)
 
-
     def __import_image(self):
-        self.image_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.tiff;*.mat;*.jpeg; *.png")])
+        self.image_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.tif")])
         if self.image_path != None :
             try:
-                # Display the image in the MainWindow
-                img = Image.open(self.image_path)
-                img = img.resize((200, 200))  # Removed Image.ANTIALIAS
-                self.img = ImageTk.PhotoImage(img)  # Keep a reference to avoid garbage collection
+                image_ms = FileManager.Load(self.image_path)
+
+                # Update the image_label to display the picture
+                image = Image.open(self.image_path)
+                image = image.resize((200,200))
                 
-                # Update the image_label to display the image
-                self.image_label.config(image=self.img, text="")
-                
+                self.img = ImageTk.PhotoImage(image=image)
+                self.image_label.config(image= self.img, text= "")
+
                 # Update the label to show the of the imported image
-                image_name = self.image_path.split("/")[-1]  # Get the file name from the path
-                self.title(f"SimulFCImage - {image_name}")  # Optionally update the window title
+                self.title(f"SimulFCImage - {image_ms.get_name()}")  # Optionally update the window title
                 
                 # Update the existing labels to show the image data
-                self.image_name_label.config(text = f"Image name : {image_name}")  # Update the existing label
-                self.reel_number_label.config(text = f"Number of reels : ")
-                self.start_wavelength_label.config(text = f"Start wavelength : ")  
-                self.end_wavelength_label.config(text = f"End wavelength : ") 
-                self.image_size_label.config(text = f"Image size : ")
+                self.image_name_label.config(text = f"Image name : {image_ms.get_name()}")  # Update the existing label
+                self.reel_number_label.config(text = f"Number of reels : {image_ms.get_number_reels()}")
+                self.start_wavelength_label.config(text = f"Start wavelength : {image_ms.get_start_wavelength()}")  
+                self.end_wavelength_label.config(text = f"End wavelength : {image_ms.get_end_wavelength()}") 
+                self.image_size_label.config(text = f"Image size : {image_ms.get_size()[0]} x {image_ms.get_size()[1]}")
                  
                 # Enable the simulation buttons
                 self.sim_btn.config(state='normal')  # Enable the button after image import
@@ -128,6 +129,3 @@ class MainWindow(tk.Tk):
         if self.image_path != None :  # Ensure there is an image path before opening the window
             SimulationChoiceWindow(self, self.image_path)  # Pass image_path to SimulationChoiceWindow
             
-if __name__ == "__main__":
-    app = MainWindow()
-    app.mainloop()
