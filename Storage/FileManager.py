@@ -1,5 +1,6 @@
 from LogicLayer.ImageMS import ImageMS
 import rasterio
+import os
 from Storage.ImageManager import ImageManager
 
 class FileManager : 
@@ -28,35 +29,40 @@ class FileManager :
         pass
 
     @staticmethod
-    def Load(path : str) -> ImageMS : 
+    def Load(path : str, start_wavelength : int, end_wavelength : int, step : int) -> ImageMS : 
         """
         Static method which allow to load an Image from a directory selected by the user 
         args : 
-            - path : represent the path of the image as a string
+            
+        path : represent the path of the image as a string
+        start_wavelength : int which means the begin wavelength of the image
+        end_wavelength : int which specify the ending wavelength of the image
+        step : int number which allow to say the step numbers between reels
         @return : an ImageMS object
-        
-        Author : Lakhdar Gibril
-        """ 
-        # This will allow to open the folder and access to metadata 
-        with rasterio.open(path) as dataset :         
-        
-            list_band = []
-            # We get the tags of all the bands for the list
-            for index in range (1, dataset.count + 1) : 
-                band_metadata = dataset.tags(index)
-                list_band.append(ImageManager.create_reel_instance([dataset.read(index), band_metadata.get('SPECTRAL_WAVELENGTH')]))
 
-            # We get the tags of the first and last band
-            first_band, last_band = dataset.tags(1), dataset.tags(dataset.count)
-            start_wavelength = 0
-            end_wavelength = 0
+        Author : Alexis Paris""" 
+        current_wavelength = start_wavelength
+        reels = []
+        image = None
 
-            if ('SPECTRAL_WAVELENGTH' in first_band) and ('SPECTRAL_WAVELENGTH' in last_band) : 
-                start_wavelength, end_wavelength = first_band['SPECTRAL_WAVELENGTH'], last_band['SPECTRAL_WAVELENGTH'] 
+        for filename in os.listdir(path):
+            f = os.path.join(path, filename)
+            if os.path.isfile(f):
+                with rasterio.open(f) as dataset :
+                    wavelength = current_wavelength + step
+                    reels.append(ImageManager.create_reel_instance(dataset.read(1),(current_wavelength,wavelength)))
+                    current_wavelength = wavelength
 
-            imageData = [path, start_wavelength, end_wavelength, dataset.shape,list_band]
-            image = ImageManager.create_imagems_instance(imageData)
-            return image
+                    imageData = [path, start_wavelength, end_wavelength, dataset.shape, reels]
+                    image = ImageManager.create_imagems_instance(imageData)
+        return image
+                    
+
+
+                    
+                
+
+            
             
         
 
