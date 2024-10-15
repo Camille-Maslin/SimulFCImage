@@ -99,53 +99,23 @@ class MainWindow(tk.Tk):
             try:
                 # Créer une fenêtre de dialogue personnalisée
                 dialog = tk.Toplevel(self)
-                dialog.title("Entrer les longueurs d'onde")
+                dialog.title("Enter the wavelengths")
 
-                tk.Label(dialog, text="Longueur d'onde de début:").grid(row=0, column=0, padx=10, pady=5)
+                tk.Label(dialog, text="Start wavelength:").grid(row=0, column=0, padx=10, pady=5)
                 start_entry = tk.Entry(dialog)
                 start_entry.grid(row=0, column=1, padx=10, pady=5)
 
-                tk.Label(dialog, text="Longueur d'onde de fin:").grid(row=1, column=0, padx=10, pady=5)
+                tk.Label(dialog, text="End wavelength:").grid(row=1, column=0, padx=10, pady=5)
                 end_entry = tk.Entry(dialog)
                 end_entry.grid(row=1, column=1, padx=10, pady=5)
 
-                tk.Label(dialog, text="Pas de la longueur d'onde:").grid(row=2, column=0, padx=10, pady=5)
+                tk.Label(dialog, text="Wavelength step:").grid(row=2, column=0, padx=10, pady=5)
                 step_entry = tk.Entry(dialog)
                 step_entry.grid(row=2, column=1, padx=10, pady=5)
 
-                def on_submit():
-                    try:
-                        start_wavelength = int(start_entry.get())
-                        end_wavelength = int(end_entry.get())
-                        wavelength_step = int(step_entry.get())
-                        dialog.destroy()
+                
 
-                        # Continuez avec le traitement de l'image
-                        image_ms = FileManager.Load(self.folder_path)
-
-                        # Update the image_label to display the picture
-                        image = Image.fromarray(image_ms.get_actualreel().get_shade_of_grey())
-                        image = image.resize((200, 200))
-                        
-                        self.img = ImageTk.PhotoImage(image=image)
-                        self.image_label.config(image=self.img, text="")
-
-                        # Update the label to show the of the imported image
-                        self.title(f"SimulFCImage - {image_ms.get_name()}")  # Optionally update the window title
-                        
-                        # Update the existing labels to show the image data
-                        self.image_name_label.config(text=f"Image name : {image_ms.get_name()}")  # Update the existing label
-                        self.reel_number_label.config(text=f"Number of reels : {image_ms.get_number_reels()}")
-                        self.start_wavelength_label.config(text=f"Start wavelength : {image_ms.get_start_wavelength()}")  
-                        self.end_wavelength_label.config(text=f"End wavelength : {image_ms.get_end_wavelength()}") 
-                        self.image_size_label.config(text=f"Image size : {image_ms.get_size()[0]} x {image_ms.get_size()[1]}")
-                         
-                        # Enable the simulation buttons
-                        self.sim_btn.config(state='normal')  # Enable the button after image import
-                    except ValueError:
-                        tk.Label(dialog, text="Veuillez entrer des valeurs valides.", fg="red").grid(row=4, columnspan=2)
-
-                submit_btn = ttk.Button(dialog, text="Soumettre", command=on_submit)
+                submit_btn = ttk.Button(dialog, text="Soumettre", command=lambda: self.on_submit(dialog,start_entry,end_entry,step_entry))
                 submit_btn.grid(row=3, columnspan=2, pady=10)
 
                 dialog.transient(self)
@@ -158,6 +128,38 @@ class MainWindow(tk.Tk):
         else:
             self.image_label.config(text="No Image")  # Reset label if no image is selected
             self.__display_default_image()  # Display the default PNG image
+
+    def on_submit(self,dialog:tk.Toplevel,start_entry:tk.Entry,end_entry:tk.Entry,step_entry:tk.Entry):
+        try:
+            start_wavelength = int(start_entry.get())
+            end_wavelength = int(end_entry.get())
+            wavelength_step = int(step_entry.get())
+            dialog.destroy()
+
+            # Continuez avec le traitement de l'image
+            image_ms = FileManager.Load(self.folder_path,start_wavelength,end_wavelength,wavelength_step)
+
+            # Update the image_label to display the picture
+            image = Image.fromarray(image_ms.get_actualreel().get_shade_of_grey())
+            image = image.resize((200, 200))
+            
+            self.img = ImageTk.PhotoImage(image=image)
+            self.image_label.config(image=self.img, text="")
+
+            # Update the label to show the of the imported image
+            self.title(f"SimulFCImage - {image_ms.get_name()}")  # Optionally update the window title
+            
+            # Update the existing labels to show the image data
+            self.image_name_label.config(text=f"Image name : {image_ms.get_name()}")  # Update the existing label
+            self.reel_number_label.config(text=f"Number of reels : {image_ms.get_number_reels()}")
+            self.start_wavelength_label.config(text=f"Start wavelength : {image_ms.get_start_wavelength()}")  
+            self.end_wavelength_label.config(text=f"End wavelength : {image_ms.get_end_wavelength()}") 
+            self.image_size_label.config(text=f"Image size : {image_ms.get_size()[0]} x {image_ms.get_size()[1]}")
+             
+            # Enable the simulation buttons
+            self.sim_btn.config(state='normal')  # Enable the button after image import
+        except ValueError:
+            tk.Label(dialog, text="Veuillez entrer des valeurs valides.", fg="red").grid(row=4, columnspan=2)
 
     def __open_simulation_choice(self):
         if self.image_path != None :  # Ensure there is an image path before opening the window
