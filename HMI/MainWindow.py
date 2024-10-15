@@ -82,11 +82,11 @@ class MainWindow(tk.Tk):
         self.sim_btn = ttk.Button(self, text="Generate a color image", command=self.__open_simulation_choice, state='disabled')
         self.sim_btn.place(x = 20, y = 430)
         
-        self.sim_btn = ttk.Button(self, text=">", command=self.__next_reel)
-        self.sim_btn.place(x = 650, y = 300)
+        self.sim_btn = ttk.Button(self, text="Previous", command=self.__previous_reel)
+        self.sim_btn.place(x = 250, y = 250)
         
-        self.sim_btn = ttk.Button(self, text="<", command=self.__previous_reel)
-        self.sim_btn.place(x = 500, y = 300)
+        self.sim_btn = ttk.Button(self, text="Next", command=self.__next_reel)
+        self.sim_btn.place(x = 470, y = 250)
 
     def __display_default_image(self):
         # Load and display the default PNG image
