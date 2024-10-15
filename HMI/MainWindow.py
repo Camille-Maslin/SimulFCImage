@@ -94,7 +94,7 @@ class MainWindow(tk.Tk):
         self.image_sim_label.config(image=self.img)
 
     def __import_image(self):
-        self.image_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.tif")])
+        self.image_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.tif *.tiff *.png")])
         if self.image_path != None :
             try:
                 image_ms = FileManager.Load(self.image_path)
