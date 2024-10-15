@@ -81,6 +81,12 @@ class MainWindow(tk.Tk):
         # Select Simulation Button
         self.sim_btn = ttk.Button(self, text="Generate a color image", command=self.__open_simulation_choice, state='disabled')
         self.sim_btn.place(x = 20, y = 430)
+        
+        self.sim_btn = ttk.Button(self, text=">", command=self.__next_reel)
+        self.sim_btn.place(x = 650, y = 300)
+        
+        self.sim_btn = ttk.Button(self, text="<", command=self.__previous_reel)
+        self.sim_btn.place(x = 500, y = 300)
 
     def __display_default_image(self):
         # Load and display the default PNG image
@@ -135,24 +141,24 @@ class MainWindow(tk.Tk):
             dialog.destroy()
 
             # Continue with the image processing
-            image_ms = FileManager.Load(self.folder_path,start_wavelength,end_wavelength,wavelength_step)
+            self.image_ms = FileManager.Load(self.folder_path,start_wavelength,end_wavelength,wavelength_step)
 
             # Update the image_label to display the picture
-            image = Image.fromarray(image_ms.get_actualreel().get_shade_of_grey())
+            image = Image.fromarray(self.image_ms.get_actualreel().get_shade_of_grey())
             image = image.resize((200, 200))
             
             self.img = ImageTk.PhotoImage(image=image)
             self.image_label.config(image=self.img, text="")
 
             # Update the label to show the of the imported image
-            self.title(f"SimulFCImage - {image_ms.get_name()}")  # Optionally update the window title
+            self.title(f"SimulFCImage - {self.image_ms.get_name()}")  # Optionally update the window title
             
             # Update the existing labels to show the image data
-            self.image_name_label.config(text=f"Image name : {image_ms.get_name()}")  # Update the existing label
-            self.reel_number_label.config(text=f"Number of reels : {image_ms.get_number_reels()}")
-            self.start_wavelength_label.config(text=f"Start wavelength : {image_ms.get_start_wavelength()}")  
-            self.end_wavelength_label.config(text=f"End wavelength : {image_ms.get_end_wavelength()}") 
-            self.image_size_label.config(text=f"Image size : {image_ms.get_size()[0]} x {image_ms.get_size()[1]}")
+            self.image_name_label.config(text=f"Image name : {self.image_ms.get_name()}")  # Update the existing label
+            self.reel_number_label.config(text=f"Number of reels : {self.image_ms.get_number_reels()}")
+            self.start_wavelength_label.config(text=f"Start wavelength : {self.image_ms.get_start_wavelength()}")  
+            self.end_wavelength_label.config(text=f"End wavelength : {self.image_ms.get_end_wavelength()}") 
+            self.image_size_label.config(text=f"Image size : {self.image_ms.get_size()[0]} x {self.image_ms.get_size()[1]}")
              
             # Enable the simulation buttons
             self.sim_btn.config(state='normal')  # Enable the button after image import
@@ -163,3 +169,18 @@ class MainWindow(tk.Tk):
         if self.image_path != None :  # Ensure there is an image path before opening the window
             SimulationChoiceWindow(self, self.image_path)  # Pass image_path to SimulationChoiceWindow
             
+    def __next_reel(self):
+        self.image_ms.next_reel()
+        image = Image.fromarray(self.image_ms.get_actualreel().get_shade_of_grey())
+        image = image.resize((200, 200))
+        
+        self.img = ImageTk.PhotoImage(image=image)
+        self.image_label.config(image=self.img, text="")
+        
+    def __previous_reel(self):
+        self.image_ms.previous_reel()
+        image = Image.fromarray(self.image_ms.get_actualreel().get_shade_of_grey())
+        image = image.resize((200, 200))
+        
+        self.img = ImageTk.PhotoImage(image=image)
+        self.image_label.config(image=self.img, text="")
