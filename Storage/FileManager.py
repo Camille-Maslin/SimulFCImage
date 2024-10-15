@@ -53,7 +53,9 @@ class FileManager :
                     reels.append(ImageManager.create_reel_instance([dataset.read(1),(current_wavelength,wavelength)]))
                     current_wavelength = wavelength
 
-        imageData = [path, start_wavelength, end_wavelength, len(reels), reels]
+        height, width = dataset.shape
+
+        imageData = [path, start_wavelength, end_wavelength, (height, width), reels]
         image = ImageManager.create_imagems_instance(imageData)
         return image
                     
@@ -71,4 +73,5 @@ class FileManager :
         
         
         
+
 
