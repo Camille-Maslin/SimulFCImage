@@ -47,14 +47,14 @@ class FileManager :
 
         for filename in os.listdir(path):
             f = os.path.join(path, filename)
-            if os.path.isfile(f) and f.lower().endswith('.png'):
+            if os.path.isfile(f) and f.lower().endswith('.tiff'):
                 with rasterio.open(f) as dataset:
                     wavelength = current_wavelength + step                    
                     reels.append(ImageManager.create_reel_instance([dataset.read(1),(current_wavelength,wavelength)]))
                     current_wavelength = wavelength
 
-                    imageData = [path, start_wavelength, end_wavelength, dataset.shape, reels]
-                    image = ImageManager.create_imagems_instance(imageData)
+        imageData = [path, start_wavelength, end_wavelength, len(reels), reels]
+        image = ImageManager.create_imagems_instance(imageData)
         return image
                     
 

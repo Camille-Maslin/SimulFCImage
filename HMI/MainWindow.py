@@ -97,7 +97,7 @@ class MainWindow(tk.Tk):
         self.folder_path = filedialog.askdirectory()
         if self.folder_path:
             try:
-                # Créer une fenêtre de dialogue personnalisée
+                # Create a custom dialog window
                 dialog = tk.Toplevel(self)
                 dialog.title("Enter the wavelengths")
 
@@ -113,9 +113,7 @@ class MainWindow(tk.Tk):
                 step_entry = tk.Entry(dialog)
                 step_entry.grid(row=2, column=1, padx=10, pady=5)
 
-                
-
-                submit_btn = ttk.Button(dialog, text="Soumettre", command=lambda: self.on_submit(dialog,start_entry,end_entry,step_entry))
+                submit_btn = ttk.Button(dialog, text="Submit", command=lambda: self.on_submit(dialog,start_entry,end_entry,step_entry))
                 submit_btn.grid(row=3, columnspan=2, pady=10)
 
                 dialog.transient(self)
@@ -136,7 +134,7 @@ class MainWindow(tk.Tk):
             wavelength_step = int(step_entry.get())
             dialog.destroy()
 
-            # Continuez avec le traitement de l'image
+            # Continue with the image processing
             image_ms = FileManager.Load(self.folder_path,start_wavelength,end_wavelength,wavelength_step)
 
             # Update the image_label to display the picture
