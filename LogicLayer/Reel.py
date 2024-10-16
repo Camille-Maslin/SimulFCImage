@@ -7,7 +7,7 @@ class Reel :
     Author : Lakhdar Gibril
     """
 
-    def __init__(self, shade_of_grey : np.ndarray, wave_length : tuple) : 
+    def __init__(self, number : int, shade_of_grey : np.ndarray, wave_length : tuple) : 
         """
         Natural constructor of the class Reel
         args : 
@@ -16,6 +16,7 @@ class Reel :
         
         Author : Lakhdar Gibril
         """
+        self.__number = number
         self.__shade_of_grey = shade_of_grey
         self.__wave_length = wave_length
 
@@ -37,3 +38,13 @@ class Reel :
         Author : Lakhdar Gibril
         """
         return self.__wave_length
+    
+    def get_number(self) -> int : 
+        """
+        Getter which allow to get the number of the reel
+        @return : the number of the reel as an int
+
+        Author : Alexandre Moreau
+        """
+        return self.__number
+

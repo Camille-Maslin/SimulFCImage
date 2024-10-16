@@ -63,6 +63,9 @@ class MainWindow(tk.Tk):
 
         self.reel_wavelength_label = tk.Label(self,bg="white",font=("Arial",12))
         self.reel_wavelength_label.place(x = 330, y = 250)
+        
+        self.reel_current_number_label = tk.Label(self,bg="white",font=("Arial",12))
+        self.reel_current_number_label.place(x = 370, y = 270)
 
         # Creating label for the image
         self.image_label = tk.Label(self, bg="white")
@@ -163,7 +166,7 @@ class MainWindow(tk.Tk):
             self.end_wavelength_label.config(text=f"End wavelength : {self.image_ms.get_end_wavelength()}") 
             self.image_size_label.config(text=f"Image size : {self.image_ms.get_size()[0]} x {self.image_ms.get_size()[1]}")
              
-            self.reel_wavelength_label.config(text=f"{self.image_ms.get_actualreel().get_wavelength()[0]} nm - {self.image_ms.get_actualreel().get_wavelength()[1]} nm")
+            self.__update_data()
             
             # Enable the simulation buttons
             self.sim_btn.config(state='normal')  # Enable the button after image import
@@ -195,4 +198,5 @@ class MainWindow(tk.Tk):
     def __update_data(self) : 
         # Updating the label data of the reel wavelength
         self.reel_wavelength_label.config(text=f"{self.image_ms.get_actualreel().get_wavelength()[0]} nm - {self.image_ms.get_actualreel().get_wavelength()[1]} nm")
+        self.reel_current_number_label.config(text=f"{self.image_ms.get_actualreel().get_number()}/{self.image_ms.get_number_reels()}")
         

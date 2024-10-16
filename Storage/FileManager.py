@@ -44,18 +44,19 @@ class FileManager :
         current_wavelength = start_wavelength
         reels = []
         image = None
-
+        reel_number = 1
         for filename in os.listdir(path):
             f = os.path.join(path, filename)
             if os.path.isfile(f) and f.lower().endswith('.tiff'):
                 with rasterio.open(f) as dataset:
                     wavelength = current_wavelength + step                    
-                    reels.append(ImageManager.create_reel_instance([dataset.read(1),(current_wavelength,wavelength)]))
+                    reels.append(ImageManager.create_reel_instance([reel_number,dataset.read(1),(current_wavelength,wavelength)]))
+                    reel_number += 1
                     current_wavelength = wavelength
 
         height, width = dataset.shape
 
-        imageData = [path, start_wavelength, end_wavelength, (height, width), reels]
+        imageData = [path, start_wavelength, end_wavelength + step, (height, width), reels]
         image = ImageManager.create_imagems_instance(imageData)
         return image
                     

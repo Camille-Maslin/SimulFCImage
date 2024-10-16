@@ -26,7 +26,7 @@ class ImageManager :
 
         Author : Lakhdar Gibril
         """
-        reel = Reel(data[0],data[1])
+        reel = Reel(data[0],data[1],data[2])
         return reel  
 
     @staticmethod
