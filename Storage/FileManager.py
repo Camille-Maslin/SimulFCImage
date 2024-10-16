@@ -47,15 +47,18 @@ class FileManager :
         reel_number = 1
         for filename in os.listdir(path):
             f = os.path.join(path, filename)
-            if os.path.isfile(f) and f.lower().endswith('.tiff'):
+            if os.path.isfile(f) and (f.lower().endswith('.tiff') or f.lower().endswith('.jpg') or f.lower().endswith('.png')):
                 with rasterio.open(f) as dataset:
-                    wavelength = current_wavelength + step                    
-                    reels.append(ImageManager.create_reel_instance([reel_number,dataset.read(1),(current_wavelength,wavelength)]))
+                    wavelength = current_wavelength + step
+                    if dataset.read(1).dtype == "uint16":
+                        image_data = (dataset.read(1)/256).astype("uint8")
+                    else:
+                        image_data = dataset.read(1)
+                    reels.append(ImageManager.create_reel_instance([reel_number,image_data,(current_wavelength,wavelength)]))
                     reel_number += 1
                     current_wavelength = wavelength
-
+                    
         height, width = dataset.shape
-
         imageData = [path, start_wavelength, end_wavelength + step, (height, width), reels]
         image = ImageManager.create_imagems_instance(imageData)
         return image
