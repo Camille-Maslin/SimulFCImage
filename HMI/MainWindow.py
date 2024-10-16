@@ -61,13 +61,16 @@ class MainWindow(tk.Tk):
         self.image_size_label = tk.Label(self, bg="white",font=("Arial", 12))
         self.image_size_label.place(x = 20, y = 310)
 
+        self.reel_wavelength_label = tk.Label(self,bg="white",font=("Arial",12))
+        self.reel_wavelength_label.place(x = 330, y = 250)
+
         # Creating label for the image
         self.image_label = tk.Label(self, bg="white")
-        self.image_label.place(x = 250, y = 70)
+        self.image_label.place(x = 150, y = 70)
         self.image_label.pack(padx=20,pady=40)
 
         self.image_sim_label = tk.Label(self,bg="white")
-        self.image_sim_label.place(x = 520, y = 70) 
+        self.image_sim_label.place(x = 680, y = 70) 
         self.image_sim_label.pack(padx=20,pady=30)
         
         # Creating the Save generated image button
@@ -81,12 +84,12 @@ class MainWindow(tk.Tk):
         # Select Simulation Button
         self.sim_btn = ttk.Button(self, text="Generate a color image", command=self.__open_simulation_choice, state='disabled')
         self.sim_btn.place(x = 20, y = 430)
+
+        self.prev_btn = ttk.Button(self, text="Previous", command=self.__previous_reel)
+        self.prev_btn.place(x = 200, y = 250)
         
-        self.sim_btn = ttk.Button(self, text="Previous", command=self.__previous_reel)
-        self.sim_btn.place(x = 250, y = 250)
-        
-        self.sim_btn = ttk.Button(self, text="Next", command=self.__next_reel)
-        self.sim_btn.place(x = 470, y = 250)
+        self.next_btn = ttk.Button(self, text="Next", command=self.__next_reel)
+        self.next_btn.place(x = 470, y = 250)
 
     def __display_default_image(self):
         # Load and display the default PNG image
@@ -160,6 +163,8 @@ class MainWindow(tk.Tk):
             self.end_wavelength_label.config(text=f"End wavelength : {self.image_ms.get_end_wavelength()}") 
             self.image_size_label.config(text=f"Image size : {self.image_ms.get_size()[0]} x {self.image_ms.get_size()[1]}")
              
+            self.reel_wavelength_label.config(text=f"{self.image_ms.get_actualreel().get_wavelength()[0]} nm - {self.image_ms.get_actualreel().get_wavelength()[1]} nm")
+            
             # Enable the simulation buttons
             self.sim_btn.config(state='normal')  # Enable the button after image import
         except ValueError:
@@ -176,6 +181,7 @@ class MainWindow(tk.Tk):
         
         self.img = ImageTk.PhotoImage(image=image)
         self.image_label.config(image=self.img, text="")
+        self.__update_data()
         
     def __previous_reel(self):
         self.image_ms.previous_reel()
@@ -184,3 +190,9 @@ class MainWindow(tk.Tk):
         
         self.img = ImageTk.PhotoImage(image=image)
         self.image_label.config(image=self.img, text="")
+        self.__update_data()
+
+    def __update_data(self) : 
+        # Updating the label data of the reel wavelength
+        self.reel_wavelength_label.config(text=f"{self.image_ms.get_actualreel().get_wavelength()[0]} nm - {self.image_ms.get_actualreel().get_wavelength()[1]} nm")
+        

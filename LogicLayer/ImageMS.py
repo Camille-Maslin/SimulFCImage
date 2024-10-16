@@ -72,7 +72,7 @@ class ImageMS (Image.Image) :
 
         Author : Lakhdar Gibril
         """
-        self.__reels = reel 
+        self.__current = reel 
 
     def get_reels(self) -> list : 
         """
@@ -109,7 +109,6 @@ class ImageMS (Image.Image) :
         """
         return self.__path
 
-
     def next_reel(self) -> None : 
         """
         Method which allow to switch to the next reel of the image and update the actual reel
@@ -122,7 +121,6 @@ class ImageMS (Image.Image) :
         else:
             self.__current = self.__reels[0]
         
-
     def previous_reel(self) -> None : 
         """
         Method which allow to switch to the previous reel of the image and update the actual reel
