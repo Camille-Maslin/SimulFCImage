@@ -64,7 +64,7 @@ class ImageMS (Image.Image) :
         """
         return self.__current
 
-    def set_actualreel(self, reel : Reel) -> None : 
+    def set_actualreel(self, number : int) -> None : 
         """
         Setter which allow to set a new actual reel of the image
         args : 
@@ -72,7 +72,7 @@ class ImageMS (Image.Image) :
 
         Author : Lakhdar Gibril
         """
-        self.__current = reel 
+        self.__current = self.__reels[number - 1] # So the reel index will not be out of range
 
     def get_reels(self) -> list : 
         """

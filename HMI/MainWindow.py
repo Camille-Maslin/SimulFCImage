@@ -127,9 +127,15 @@ class MainWindow(tk.Tk):
         self.prev_btn = ttk.Button(navigation_frame, text="Previous", command=self.__previous_reel, state='disabled')  # Set to disabled initially
         self.prev_btn.pack(side=tk.LEFT, padx=10)
 
-        # Label for Current "Reel Number"
-        self.reel_current_number_label = tk.Label(navigation_frame, bg="white", font=("Arial", 12))
+        # Label and buttons for Current "Reel Number"
+        self.reel_current_number_label = tk.Text(navigation_frame, bg="white", font=("Arial", 12),width=3,height=1, state="disabled")
         self.reel_current_number_label.pack(side=tk.LEFT, padx=10)
+
+        self.reel_total_number_label = tk.Label(navigation_frame,bg="white", font=("Arial",12))
+        self.reel_total_number_label.pack(side=tk.LEFT,padx=10)
+
+        self.__select_reel_btn = ttk.Button(navigation_frame,text="Change reel", state="disabled",command=self.__change_reel)
+        self.__select_reel_btn.pack(side=tk.LEFT,padx=10,pady=10)     
 
         self.next_btn = ttk.Button(navigation_frame, text="Next", command=self.__next_reel, state='disabled')  # Set to disabled initially
         self.next_btn.pack(side=tk.LEFT, padx=10)
@@ -267,14 +273,17 @@ class MainWindow(tk.Tk):
             self.start_wavelength_label.config(text=f"Start wavelength : {self.image_ms.get_start_wavelength()}")
             self.end_wavelength_label.config(text=f"End wavelength : {self.image_ms.get_end_wavelength()}")
             self.image_size_label.config(text=f"Image size : {self.image_ms.get_size()[0]} x {self.image_ms.get_size()[1]}")
-
-            self.__update_data()
-
+            self.reel_total_number_label.config(text=f"/ {self.image_ms.get_number_reels()}")
             # Enable the simulation buttons
             self.sim_btn.config(state='normal')  # Enable the button after image import
             self.prev_btn.config(state='normal')  # Enable the button after image import
             self.next_btn.config(state='normal')  # Enable the button after image import
+            self.__select_reel_btn.config(state='normal')
+
+            self.reel_current_number_label.config(state='normal')
             
+            self.__update_data()
+
             # Activer le bouton Save après la génération de l'image
             self.save_btn.config(state='normal')  # Enable the Save button after image generation
         except ValueError:
@@ -316,7 +325,8 @@ class MainWindow(tk.Tk):
         Updates the labels displaying the current reel wavelength and number.
         """
         self.reel_wavelength_label.config(text=f"{self.image_ms.get_actualreel().get_wavelength()[0]} nm - {self.image_ms.get_actualreel().get_wavelength()[1]} nm")
-        self.reel_current_number_label.config(text=f"{self.image_ms.get_actualreel().get_number()}/{self.image_ms.get_number_reels()}")
+        self.reel_current_number_label.delete(1.0,tk.END)
+        self.reel_current_number_label.insert(tk.END,f"{self.image_ms.get_actualreel().get_number()}")
 
     def load_image(self, path, size=(400, 400)):  # Default size
         """
@@ -332,6 +342,20 @@ class MainWindow(tk.Tk):
         img = Image.open(path)
         img = img.resize(size)  # Resize to the specified size
         return ImageTk.PhotoImage(img)
+
+    def __change_reel(self) : 
+        """
+        Allow to change reel number with the input of the user
+        """
+        reel_number = int(self.reel_current_number_label.get(1.0,tk.END))
+        if (reel_number <= self.image_ms.get_number_reels()) :
+            self.image_ms.set_actualreel(reel_number)
+            image = Image.fromarray(self.image_ms.get_actualreel().get_shade_of_grey())
+            image = image.resize((400, 400))
+
+            self.img = ImageTk.PhotoImage(image=image)
+            self.image_label.config(image=self.img, text="")
+            self.__update_data()
 
     def quit_application(self):
         """
