@@ -6,14 +6,11 @@ from Storage.ImageManager import ImageManager
 class FileManager : 
     """
     Class FileManager which allow to save or load a multispectral image
-
-    Author : Lakhdar Gibril
     """
 
     def __init__(self) : 
         """
         Default constructor of FileManager class
-        Author : 
         """
         pass 
     
@@ -21,10 +18,8 @@ class FileManager :
     def Save(image : ImageMS) -> None : 
         """
         Static method which allow to save an image 
-        args : )
+        Parameters : 
             - the image created by the simulation, which is an instance of the ImageMS class 
-
-        Author : 
         """
         pass
 
@@ -32,7 +27,7 @@ class FileManager :
     def Load(path : str, start_wavelength : int, end_wavelength : int, step : int) -> ImageMS : 
         """
         Static method which allows loading an Image from a directory selected by the user 
-        args: 
+        Parameters : 
             path: represent the path of the image as a string
             start_wavelength: int which means the begin wavelength of the image
             end_wavelength: int which specify the ending wavelength of the image

@@ -6,20 +6,19 @@ class SimulationChoiceWindow(tk.Toplevel):
     SimulationChoiceWindow class which inherit of the tk.Toplevel class, 
     this window will allow to choose a simulation method for the image
 
-    Author :   
+    Author : Camille Maslin  
     """
-
 
     def __init__(self, parent : tk.Tk, image_path : str): 
         """
         Constructor of SimulationChoiceWindow class where we initialize the window parameters
         like the title, the size and widgets   
 
-        args :
+        Parameters :
             - parent : a parent window which inherit on the tk.Tk class
             - image_path (str) : the image path as a string selected in the MainWindow
 
-        Author : 
+        Author : Camille Maslin
         """
         super().__init__(parent)
         self.image_path = image_path  # Store the image_path
