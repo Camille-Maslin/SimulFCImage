@@ -21,3 +21,50 @@ allowing users to perceive them in color. With its intuitive user interface, it 
 	<li>Displaying the generated image with the option to save it.</li>
 </ul>
 
+<h2>Project Architecture</h2>
+
+```bash
+C:.
+│   .gitignore
+│   Program.py
+│   setup.py
+│
+├───Exceptions
+│   │   NotExistingBandException.py
+│
+├───HMI
+│   │   MainWindow.py
+│   │   SimulationChoiceWindow.py
+│   │
+│   ├───assets
+│   │       home-logo.png
+│   │       Logo-iut-dijon-auxerre-nevers.png
+│   │       Logo-laboratoire-ImViA.png
+│   │       no-image.1024x1024.png
+│
+├───LogicLayer
+│   │   Band.py
+│   │   ImageMS.py
+│   │
+│   ├───Factory
+│   │   │   SimulatorFactory.py
+│   │   │
+│   │   ├───CreateSimulating
+│   │   │       CreateBandChoiceSimulating.py
+│   │   │       CreateBeeSimulating.py
+│   │   │       CreateDaltonianSimulating.py
+│   │   │       CreateHumanSimulating.py
+│   │   │       ICreateSimulator.py
+│   │   │
+│   │   └───Simulating
+│   │           BandChoiceSimulating.py
+│   │           BeeSimulating.py
+│   │           DaltonianSimulating.py
+│   │           HumanSimulating.py
+│   │           SimulatingMethod.py
+│   │
+│
+└───Storage
+    │   FileManager.py
+    │   ImageManager.py
+```
