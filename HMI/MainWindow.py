@@ -269,7 +269,7 @@ class MainWindow(tk.Tk):
             self.next_btn.config(state='normal')  # Enable the button after image import
 
             self.reel_current_number_text.config(state='normal')
-            self.reel_current_number_text.bind('<Return>')
+            self.reel_current_number_text.bind('<Return>', self.__on_return_pressed)
             
             self.__update_data()
 
@@ -334,15 +334,26 @@ class MainWindow(tk.Tk):
         img = Image.open(path)
         img = img.resize(size)  # Resize to the specified size
         return ImageTk.PhotoImage(img)
+    
+    def __on_return_pressed(self, event):
+        reel_number = self.reel_current_number_text.get(1.0,tk.END)
+        try :
+            band = int(reel_number)
+            self.__change_reel(band)
+            
+        except (TypeError,ValueError):
+            messagebox.askokcancel("Input Error","The band number must be an integer, not a string !")
 
-    def __change_reel(self) : 
+        finally:
+            self.reel_current_number_text.delete(1.0,tk.END)
+
+    def __change_reel(self, reel_number:int): 
         """
         Allow to change reel number with the input of the user
         Author : Lakhdar Gibril
         """
-        reel_number = self.reel_current_number_text.get(1.0,tk.END)
         try :
-            if ((reel_number.isdigit() != True) or (int(reel_number) > self.image_ms.get_number_reels())) : 
+            if ((reel_number > self.image_ms.get_number_reels()) or (reel_number < 1)) : 
                 raise NotExistingBandException("The band is nonexistant")
             
             else :       
