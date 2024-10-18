@@ -1,6 +1,6 @@
-from HMI.SimulatingMethod import SimulatingMethod
+from LogicLayer.Factory.Simulating.SimulatingMethod import SimulatingMethod
 
-class DaltonianSimulating(SimulatingMethod):
+class BeeSimulating(SimulatingMethod):
     def __init__(self, image_ms):
         super().__init__(image_ms)
 

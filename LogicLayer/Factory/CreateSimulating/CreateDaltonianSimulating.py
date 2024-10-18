@@ -1,5 +1,5 @@
-from LogicLayer.ICreateSimulator import SimulatorFactory
-from HMI.DaltonianSimulating import DaltonianSimulating
+from LogicLayer.Factory.CreateSimulating.ICreateSimulator import SimulatorFactory
+from LogicLayer.Factory.Simulating.DaltonianSimulating import DaltonianSimulating
 
 class CreateDaltonianSimulator(SimulatorFactory):
     def create_simulator(self, image_ms):

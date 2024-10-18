@@ -1,5 +1,5 @@
-from LogicLayer.ICreateSimulator import SimulatorFactory
-from HMI.HumanSimulating import HumanSimulating
+from LogicLayer.Factory.CreateSimulating.ICreateSimulator import SimulatorFactory
+from LogicLayer.Factory.Simulating.HumanSimulating import HumanSimulating
 
 class CreateHumanSimulator(SimulatorFactory):
     def create_simulator(self, image_ms):

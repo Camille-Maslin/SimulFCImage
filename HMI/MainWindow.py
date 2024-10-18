@@ -1,133 +1,354 @@
 import tkinter as tk
-from tkinter import ttk, filedialog
-from PIL import Image, ImageTk  # Import PIL for image handling
-import os
-from HMI.SimulationChoiceWindow import SimulationChoiceWindow  # Ensure this import is present
+from tkinter import ttk, filedialog, messagebox
+from PIL import Image, ImageTk
+from Storage.FileManager import FileManager
+from HMI.SimulationChoiceWindow import SimulationChoiceWindow
+from Exceptions.NotExistingBandException import NotExistingBandException
 
 class MainWindow(tk.Tk):
     """
-    Class MainWindow which inherit of the tk.TK class, it will represent the main page of the software
-    
-    Author :
+    MainWindow class inherits from the Tk class and represents the main interface of the application.
+    It provides functionalities to import images, display image data, and generate simulations.
     """
 
-    def __init__(self) :
+    def __init__(self):
         """
-        Constructor of the class MainWindow, where you can configure the different widgets and the 
-        window parameters.
+        Initializes the MainWindow class, sets up the window parameters, and initializes the widgets.
 
-        Author :  
+        Author :  Camille Maslin, Lakhdar Gibril
         """
         # Calling the parent constructor of the Tk class.
         super().__init__()
 
+        # Set up the main window properties
         self.title("SimulFCImage - Main Window")
-        self.geometry("800x600")
-        self.configure(bg='white')
+        self.attributes('-fullscreen', True)  # Enable fullscreen mode
+        self.configure(bg='white')  # Set background color
+        self.columnconfigure(0, weight=1)  # Configure column weight for responsiveness
+        self.rowconfigure(0, weight=1)  # Configure row weight for responsiveness
 
-        # Style TTK
-        self.style = ttk.Style(self)
-        self.style.theme_use('clam')
-        self.style.configure('TButton', font=('Arial', 12), padding=10)
-        self.style.configure('TLabel', font=('Arial', 14))
+        # Configure TTK styles
+        self.__style = ttk.Style(self)
+        self.__style.theme_use('clam')  # Set the theme
+        self.__style.configure('TButton', font=('Arial', 12), padding=10)  # Button style
+        self.__style.configure('TLabel', font=('Arial', 14))  # Label style
 
-        # Widgets
-        self.image_path = None
-        self.image_label = None  # Initialize image_label
+        # Initialize instance variables
+        self.__image_path = None  # Path to the imported image
+        self.__image_label = None  # Label to display the image
+
+        # Initialize to None the ImageMS class object
+        self.__image_ms = None
+
+        # Initialize the user interface widgets
         self.__initialize_widgets()
-
-        # Display default PNG image
+        # Display a default PNG image at startup
         self.__display_default_image()
 
-    def __initialize_widgets (self) :
-        # Creating all the label for the image data
-        self.image_data_label = tk.Label(self, text="Image Data", bg="white", font=("Arial", 18))
-        self.image_data_label.place(x = 20, y = 10)
+    def __initialize_widgets(self):
+        """
+        Initializes the main interface widgets, including frames, labels, and buttons.
+        Sets up the layout for displaying image data and controls for user interaction.
+        """
+        # Main frame to contain the grid layout
+        self.__main_frame = tk.Frame(self, bg="white")
+        self.__main_frame.grid(sticky="nsew")
 
-        self.image_name_label = tk.Label(self, bg="white",font=("Arial", 12))
-        self.image_name_label.place(x = 20, y = 70)
+        # Configure grid responsiveness
+        self.__main_frame.columnconfigure([0, 1, 2], weight=1)
+        self.__main_frame.rowconfigure([0, 1, 2, 3], weight=1)
 
-        self.reel_number_label = tk.Label(self, bg="white",font=("Arial", 12))
-        self.reel_number_label.place(x = 20, y = 130)
+        # Image Data Section
+        self.__image_data_frame = tk.Frame(self.__main_frame, bg="white")
+        self.__image_data_frame.grid(row=0, column=0, padx=20, pady=20, sticky="nw")
 
-        self.start_wavelength_label = tk.Label(self, bg="white",font=("Arial", 12))
-        self.start_wavelength_label.place(x = 20, y = 190)
+        # Labels for displaying image data
+        self.__image_data_label = tk.Label(self.__image_data_frame, text="Image Data", bg="white", font=("Arial", 18))
+        self.__image_data_label.pack(anchor="w")
 
-        self.end_wavelength_label = tk.Label(self, bg="white",font=("Arial", 12))
-        self.end_wavelength_label.place(x = 20, y = 250)
+        self.__image_name_label = tk.Label(self.__image_data_frame, bg="white", font=("Arial", 12))
+        self.__image_name_label.pack(anchor="w")
 
-        self.image_size_label = tk.Label(self, bg="white",font=("Arial", 12))
-        self.image_size_label.place(x = 20, y = 310)
+        self.__band_number_label = tk.Label(self.__image_data_frame, bg="white", font=("Arial", 12))
+        self.__band_number_label.pack(anchor="w")
 
-        # Creating label for the image
-        self.image_label = tk.Label(self, bg="white")
-        self.image_label.place(x = 250, y = 70)
-        self.image_label.pack(padx=20,pady=40)
+        self.__start_wavelength_label = tk.Label(self.__image_data_frame, bg="white", font=("Arial", 12))
+        self.__start_wavelength_label.pack(anchor="w")
 
-        self.image_sim_label = tk.Label(self,bg="white")
-        self.image_sim_label.place(x = 520, y = 70) 
-        self.image_sim_label.pack(padx=20,pady=30)
-        
-        # Creating the Save generated image button
-        self.save_btn = ttk.Button(self, text = "Save")
-        self.save_btn.pack(padx=20)
+        self.__end_wavelength_label = tk.Label(self.__image_data_frame, bg="white", font=("Arial", 12))
+        self.__end_wavelength_label.pack(anchor="w")
 
-        # Import Image Button
-        import_btn = ttk.Button(self, text="Import an image", command=self.__import_image)
-        import_btn.place(x = 20, y = 370)
+        self.__image_size_label = tk.Label(self.__image_data_frame, bg="white", font=("Arial", 12))
+        self.__image_size_label.pack(anchor="w")
 
-        # Select Simulation Button
-        self.sim_btn = ttk.Button(self, text="Generate a color image", command=self.__open_simulation_choice, state='disabled')
-        self.sim_btn.place(x = 20, y = 430)
+        # Labels for current band wavelength and number
+        self.__band_wavelength_label = tk.Label(self.__image_data_frame, bg="white", font=("Arial", 12))
+        self.__band_wavelength_label.pack(anchor="w")
+
+        self.__band_current_number_label = tk.Label(self.__image_data_frame, bg="white", font=("Arial", 12))
+        self.__band_current_number_label.pack(anchor="w")
+
+        # Controls section for importing images and generating simulations
+        self.__controls_frame = tk.Frame(self.__main_frame, bg="white")
+        self.__controls_frame.grid(row=1, column=0, padx=20, pady=20, sticky="nw")
+
+        self.__import_btn = ttk.Button(self.__controls_frame, text="Import an image", command=self.__import_image)
+        self.__import_btn.pack(pady=10)
+
+        self.__sim_btn = ttk.Button(self.__controls_frame, text="Generate a color image", command=self.__open_simulation_choice, state='disabled')
+        self.__sim_btn.pack(pady=10)
+
+        # Image Display Section
+        self.__image_display_frame = tk.Frame(self.__main_frame, bg="white")
+        self.__image_display_frame.grid(row=0, column=1, rowspan=2, padx=20, pady=20, sticky="nsew")
+
+        # Frame to hold both imported and simulated images side by side
+        self.__images_frame = tk.Frame(self.__image_display_frame, bg="white")
+        self.__images_frame.pack(pady=(0, 5), fill="both", expand=True)
+
+        # Frame for imported image
+        self.__imported_image_frame = tk.Frame(self.__images_frame, bg="white")
+        self.__imported_image_frame.pack(side=tk.LEFT, padx=10, fill="both", expand=True)
+
+        # Label for the current band wavelength
+        self.__band_wavelength_label = tk.Label(self.__imported_image_frame, bg="white", font=("Arial", 12))
+        self.__band_wavelength_label.pack(pady=(5, 5))  # Space below the label
+
+        # Label for "Imported Image"
+        self.__imported_image_label = tk.Label(self.__imported_image_frame, bg="white", text="Imported Image", font=("Arial", 12))
+        self.__imported_image_label.pack(pady=(0, 5))  # Space below the label
+
+        # Image label for original image
+        self.__image_label = tk.Label(self.__imported_image_frame, bg="white")
+        self.__image_label.pack(padx=10, pady=10)
+
+        # Frame for navigation buttons (Previous/Next)
+        self.__navigation_frame = tk.Frame(self.__imported_image_frame, bg="white")
+        self.__navigation_frame.pack(pady=(10, 5))  # Space between the image and buttons
+
+        # Previous/Next buttons for band navigation
+        self.__prev_btn = ttk.Button(self.__navigation_frame, text="Previous", command=self.__previous_band, state='disabled')  # Set to disabled initially
+        self.__prev_btn.pack(side=tk.LEFT, padx=10)
+
+        # Label and buttons for Current "Band Number"
+        self.__band_current_number_text = tk.Text(self.__navigation_frame, bg="white", font=("Arial", 12),width=3,height=1, state="disabled")
+        self.__band_current_number_text.pack(side=tk.LEFT, padx=10)
+        self.__band_total_number_label = tk.Label(self.__navigation_frame, bg="white", font=("Arial", 12))
+        self.__band_total_number_label.pack(side=tk.LEFT, padx=10)  
+
+        self.__next_btn = ttk.Button(self.__navigation_frame, text="Next", command=self.__next_band, state='disabled')  # Set to disabled initially
+        self.__next_btn.pack(side=tk.LEFT, padx=10)
+
+        # Frame for simulated image
+        self.__simulated_image_frame = tk.Frame(self.__images_frame, bg="white")
+        self.__simulated_image_frame.pack(side=tk.LEFT, padx=10, fill="both", expand=True)
+
+        # Label for "Simulated Image"
+        self.__simulated_image_label = tk.Label(self.__simulated_image_frame, bg="white", text="Simulated Image", font=("Arial", 12))
+        self.__simulated_image_label.pack(pady=(30, 5))  # Space above and below the label
+
+        # Image label for simulated image
+        self.__image_sim_label = tk.Label(self.__simulated_image_frame, bg="white")
+        self.__image_sim_label.pack(padx=10, pady=(10, 0))  # Add padding above the generated image
+
+        # Save Button
+        self.__save_btn = ttk.Button(self.__simulated_image_frame, text="Save", state='disabled')
+        self.__save_btn.pack(pady=20)  # Place the button under the simulated image
+
+        # Placeholder for logos
+        self.__logo_frame = tk.Frame(self.__main_frame, bg="white")
+        self.__logo_frame.grid(row=3, column=0, columnspan=3, pady=20, sticky="ew")
+
+        # Left logo placeholder
+        self.__left_logo_image = self.__load_image("HMI/assets/Logo-iut-dijon-auxerre-nevers.png", size=(300, 160))  # Store the image with size 300x160
+        self.__left_logo = tk.Label(self.__logo_frame, image=self.__left_logo_image, bg="white")
+        self.__left_logo.pack(side=tk.LEFT, padx=(100, 10))
+
+        # Right logo placeholder
+        self.__right_logo_image = self.__load_image("HMI/assets/Logo-laboratoire-ImViA.png", size=(300, 160))  # Store the image with size 300x160
+        self.__right_logo = tk.Label(self.__logo_frame, image=self.__right_logo_image, bg="white")
+        self.__right_logo.pack(side=tk.RIGHT, padx=(10, 100))
+
+        # Quit button at the top right
+        self__quit_btn = ttk.Button(self.__main_frame, text="Quit", command=self.quit_application)
+        self__quit_btn.grid(row=0, column=2, padx=10, pady=10, sticky="ne")  # Place the button at the top right
 
     def __display_default_image(self):
-        # Load and display the default PNG image
-        png_path = "HMI/assets/no-image.1024x1024.png"  # Path to your PNG image
-
-        # Load and display the PNG image
-        img = Image.open(png_path)
-        img = img.resize((200, 200))  
-        self.img = ImageTk.PhotoImage(img)  # Keep a reference to avoid garbage collection
-        self.image_label.config(image=self.img)  # Update the image_label to display the image
-        self.image_sim_label.config(image=self.img)
-
+        """
+        Loads and displays the default PNG image when the application starts or when no image is selected.
+        """
+        png_path = "HMI/assets/no-image.1024x1024.png"
+        image = Image.open(png_path)
+        image = image.resize((400, 400))  # Resize to the specified size
+        self.__img = ImageTk.PhotoImage(image)
+        self.__image_label.config(image=self.__img)
+        self.__image_sim_label.config(image=self.__img)
 
     def __import_image(self):
-        self.image_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.tiff;*.mat;*.jpeg; *.png")])
-        if self.image_path != None :
+        """
+        Opens a dialog to import an image and prompts the user to enter wavelength parameters.
+        """
+        self.__folder_path = filedialog.askdirectory()
+        if self.__folder_path:
             try:
-                # Display the image in the MainWindow
-                img = Image.open(self.image_path)
-                img = img.resize((200, 200))  # Removed Image.ANTIALIAS
-                self.img = ImageTk.PhotoImage(img)  # Keep a reference to avoid garbage collection
-                
-                # Update the image_label to display the image
-                self.image_label.config(image=self.img, text="")
-                
-                # Update the label to show the of the imported image
-                image_name = self.image_path.split("/")[-1]  # Get the file name from the path
-                self.title(f"SimulFCImage - {image_name}")  # Optionally update the window title
-                
-                # Update the existing labels to show the image data
-                self.image_name_label.config(text = f"Image name : {image_name}")  # Update the existing label
-                self.reel_number_label.config(text = f"Number of reels : ")
-                self.start_wavelength_label.config(text = f"Start wavelength : ")  
-                self.end_wavelength_label.config(text = f"End wavelength : ") 
-                self.image_size_label.config(text = f"Image size : ")
-                 
-                # Enable the simulation buttons
-                self.sim_btn.config(state='normal')  # Enable the button after image import
-            except Exception as e:
-                print(f"Error loading image: {e}. line : {e.__traceback__.tb_lineno}")  # Print error message to console
-                self.image_label.config(text="Error loading image")  # Update label to show error
-        else:
-            self.image_label.config(text="No Image")  # Reset label if no image is selected
-            self.__display_default_image()  # Display the default PNG image
+                # Create a custom dialog window
+                dialog = tk.Toplevel(self)
+                dialog.title("Enter the wavelengths")
+
+                tk.Label(dialog, text="Start wavelength:").grid(row=0, column=0, padx=10, pady=5)
+                start_entry = tk.Entry(dialog)
+                start_entry.grid(row=0, column=1, padx=10, pady=5)
+
+                tk.Label(dialog, text="End wavelength:").grid(row=1, column=0, padx=10, pady=5)
+                end_entry = tk.Entry(dialog)
+                end_entry.grid(row=1, column=1, padx=10, pady=5)
+
+                tk.Label(dialog, text="Wavelength step:").grid(row=2, column=0, padx=10, pady=5)
+                step_entry = tk.Entry(dialog)
+                step_entry.grid(row=2, column=1, padx=10, pady=5)
+
+                submit_btn = ttk.Button(dialog, text="Submit", command=lambda: self.__on_submit(dialog, start_entry, end_entry, step_entry))
+                submit_btn.grid(row=3, columnspan=2, pady=10)
+
+                dialog.transient(self)
+                dialog.grab_set()
+                self.wait_window(dialog)
+
+                self.__image_path = self.__folder_path  # Update the path of the imported image
+
+            except Exception :
+                messagebox.askokcancel("Loading Error","Error loading image")
+
+    def __on_submit(self, dialog: tk.Toplevel, start_entry: tk.Entry, end_entry: tk.Entry, step_entry: tk.Entry):
+        """
+        Processes the wavelength parameters entered by the user and updates the image display accordingly.
+
+        Parameters:
+        - dialog: The dialog window for entering wavelengths.
+        - start_entry: Entry widget for the start wavelength.
+        - end_entry: Entry widget for the end wavelength.
+        - step_entry: Entry widget for the wavelength step.
+        """
+        try:
+            start_wavelength = int(start_entry.get())
+            end_wavelength = int(end_entry.get())
+            wavelength_step = int(step_entry.get())
+            dialog.destroy()
+
+            # Continue with the image processing
+            self.__image_ms = FileManager.Load(self.__folder_path, start_wavelength, end_wavelength, wavelength_step)
+
+            self.__update_image()
+
+            # Update the label to show the name of the imported image
+            self.title(f"SimulFCImage - {self.__image_ms.get_name()}")
+
+            # Update the existing labels to show the image data
+            self.__image_name_label.config(text=f"Image name : {self.__image_ms.get_name()}")  # Update the existing label
+            self.__band_number_label.config(text=f"Number of bands : {self.__image_ms.get_number_bands()}")
+            self.__start_wavelength_label.config(text=f"Start wavelength : {self.__image_ms.get_start_wavelength()}")
+            self.__end_wavelength_label.config(text=f"End wavelength : {self.__image_ms.get_end_wavelength()}")
+            self.__image_size_label.config(text=f"Image size : {self.__image_ms.get_size()[0]} x {self.__image_ms.get_size()[1]}")
+            self.__band_total_number_label.config(text=f"/ {self.__image_ms.get_number_bands()}")
+            
+            # Enable the simulation buttons
+            self.__sim_btn.config(state='normal')  # Enable the button after image import
+            self.__prev_btn.config(state='normal')  # Enable the button after image import
+            self.__next_btn.config(state='normal')  # Enable the button after image import
+
+            self.__band_current_number_text.config(state='normal')
+            self.__band_current_number_text.bind('<Return>', self.__on_return_pressed)
+            
+            self.__update_data()
+
+            # Enable the Save button after image generation
+            self.__save_btn.config(state='normal')  
+        except ValueError:
+            tk.Label(dialog, text="Please enter valid values.", fg="red").grid(row=4, columnspan=2)
 
     def __open_simulation_choice(self):
-        if self.image_path != None :  # Ensure there is an image path before opening the window
-            SimulationChoiceWindow(self, self.image_path)  # Pass image_path to SimulationChoiceWindow
+        """
+        Opens the simulation choice window if an image has been imported.
+        """
+        if self.__image_path is not None:  # Ensure there is an image path before opening the window
+            SimulationChoiceWindow(self, self.__image_path)  # Pass image_path to SimulationChoiceWindow
             
-if __name__ == "__main__":
-    app = MainWindow()
-    app.mainloop()
+    def __next_band(self):
+        """
+        Advances to the next band and updates the displayed image and data.
+        """
+        self.__image_ms.next_band()
+        self.__update_image()
+        self.__update_data()
+
+    def __previous_band(self):
+        """
+        Goes back to the previous band and updates the displayed image and data.
+        """
+        self.__image_ms.previous_band()
+        self.__update_image()
+        self.__update_data()
+
+    def __update_data(self):
+        """
+        Updates the labels displaying the current band wavelength and number.
+        """
+        self.__band_wavelength_label.config(text=f"{self.__image_ms.get_actualband().get_wavelength()[0]} nm - {self.__image_ms.get_actualband().get_wavelength()[1]} nm")
+        self.__band_current_number_text.delete(1.0, tk.END)
+        self.__band_current_number_text.insert(tk.END, f"{self.__image_ms.get_actualband().get_number()}")
+    
+    def __update_image(self) : 
+        """
+        Update the image label due to the band change
+        """ 
+        image = Image.fromarray(self.__image_ms.get_actualband().get_shade_of_grey())
+        image = image.resize((400, 400))
+
+        self.__img = ImageTk.PhotoImage(image=image)
+        self.__image_label.config(image=self.__img, text="")
+
+    def __load_image(self, path, size=(400, 400)):  # Default size
+        """
+        Loads an image from the specified path and resizes it to the given dimensions.
+
+        Parameters:
+        - path: The file path of the image to load.
+        - size: A tuple specifying the desired width and height.
+
+        Returns:
+        - A PhotoImage object for displaying in a label.
+        """
+        img = Image.open(path)
+        img = img.resize(size)  # Resize to the specified size
+        return ImageTk.PhotoImage(img)
+    
+    def __on_return_pressed(self, event):
+        band_number = self.__band_current_number_text.get(1.0, tk.END).strip()
+        try:
+            band = int(band_number)
+            self.__change_band(band)
+        except (TypeError, ValueError):
+            messagebox.askokcancel("Input Error", "The band number must be an integer, not a string!")
+        finally:
+            self.__band_current_number_text.delete(1.0, tk.END)
+
+    def __change_band(self, band_number: int):
+        """
+        Allow to change reel number with the input of the user
+        Author : Lakhdar Gibril
+        """
+        try:
+            if (band_number > self.__image_ms.get_number_bands()) or (band_number < 1):
+                raise NotExistingBandException("The band is nonexistant")
+            else:
+                self.__image_ms.set_actualband(band_number)
+                self.__update_image()
+                self.__update_data()
+        except NotExistingBandException as exception:
+            messagebox.askokcancel("Input Error", exception.__str__())
+
+    def quit_application(self):
+        """
+        Closes the application.
+        """
+        self.destroy()  # Close the application

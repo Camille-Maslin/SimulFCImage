@@ -1,5 +1,5 @@
-from LogicLayer.ICreateSimulator import SimulatorFactory
-from HMI.BeeSimulating import BeeSimulating
+from LogicLayer.Factory.CreateSimulating.ICreateSimulator import SimulatorFactory
+from LogicLayer.Factory.Simulating.BeeSimulating import BeeSimulating
 
 class CreateBeeSimulator(SimulatorFactory):
     def create_simulator(self, image_ms):
