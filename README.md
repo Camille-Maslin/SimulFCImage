@@ -23,12 +23,15 @@ allowing users to perceive them in color. With its intuitive user interface, it 
 
 <h2>How to use the application ?</h2> 
 
-<h3>Situation 1 : You have the application compiled as an .exe file</h3>
-
-<p>Launch the application. </p>
+<h3>Situation 1 : You want the application compiled as an .exe file</h3>
+<p>Dowload the SimulFCImage.zip file in this GoogleDrive : https://drive.google.com/drive/folders/1uRv_wMsNEgHqScpr94n4Br1E7VYtcmYx?usp=sharing</p>
+<p>(You may want to dowload the dataset folder "Egyptian_Statue" present in the GoogleDrive with the application)</p>
+<p>Unzip the SimulFCImage.zip.</p>
+<p>Launch the application SimulFCImage.exe. </p>
 <p>A window will open with a button labeled "Import an image."</p>
 <p>Click this button and select a folder containing your multispectral images in .tiff format.</p>
-<p>If you don't have a folder of multispectral images, you can use the test images provided in the project under 'S5_C1_LaBabaTcheam/Testing-Data'.</p>
+<p>If you don't have a folder of multispectral images, you can use the test images provided in the project under ['S5_C1_LaBabaTcheam/Testing-Data'](https://github.com/dept-info-iut-dijon/S5_C1_LaBabaTcheam/tree/main/Testing-Data/Egyptian_Statue).</p>
+<p>(The same file as the one available on GoogleDrive)</p>
 <p>Once you click OK, your image will appear in the application.</p>
 <p>You can view each band of the image by clicking the "Next" and "Previous" buttons.</p>
 <p>Please note that features such as "Generate a color image" and the "Save" button are not yet implemented.</p>
@@ -44,7 +47,7 @@ pip install Pillow rasterio numpy cx_Freeze
 ```
 
 <p>Once the installation is complete, you can compile the application by running the Program.py file.</p>
-<p>To learn how to use the application with the dataset, follow the instructions from the previous section.</p>
+<p>To learn how to use the application with the dataset, follow the instructions from the previous section starting at the "Launch the application SimulFCImage.exe".</p>
 
 <h2>Project Architecture</h2>
 
