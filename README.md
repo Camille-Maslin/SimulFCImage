@@ -21,49 +21,66 @@ allowing users to perceive them in color. With its intuitive user interface, it 
 	<li>Displaying the generated image with the option to save it.</li>
 </ul>
 
+<h2>How to use the application ?</h2> 
+
+<h3>Situation 1 : You have the application compiled as an .exe file</h3>
+
+<p>Launch the application. </p>
+<p>A window will open with a button labeled "Import an image."</p>
+<p>Click this button and select a folder containing your multispectral images in .tiff format.</p>
+<p>If you don't have a folder of multispectral images, you can use the test images provided in the project under 'S5_C1_LaBabaTcheam/Testing-Data'.</p>
+<p>Once you click OK, your image will appear in the application.</p>
+<p>You can view each band of the image by clicking the "Next" and "Previous" buttons.</p>
+<p>Please note that features such as "Generate a color image" and the "Save" button are not yet implemented.</p>
+
+<br>
+
+<h3>Situation 2: You are using git clone to compile the project yourself</h3>
+
+<p>First, you need to install a few Python libraries. Run the following command in your command prompt (CMD): </p>
+
+```bash
+pip install Pillow Asterio numpy cx_Freeze
+```
+
+<p>Once the installation is complete, you can compile the application by running the Program.py file.</p>
+<p>To learn how to use the application with the dataset, follow the instructions from the previous section.</p>
+
 <h2>Project Architecture</h2>
 
 ```bash
 S5_C1_LaBabaTcheam
-│   .gitignore
-│   Program.py
-│   README.md
-│   setup.py
-├───Exceptions
-│   │   NotExistingBandException.py
-│   │
-│   └───__pycache__
-│           NotExistingBandException.cpython-311.pyc
-├───HMI
-│   │   MainWindow.py
-│   │   SimulationChoiceWindow.py
-│   ├───assets
-│   │       home-logo.png
-│   │       Logo-iut-dijon-auxerre-nevers.png
-│   │       Logo-laboratoire-ImViA.png
-│   │       no-image.1024x1024.png
-├───LogicLayer
-│   │   Band.py
-│   │   ImageMS.py
-│   │
-│   ├───Factory
-│   │   │   SimulatorFactory.py
-│   │   │
-│   │   ├───CreateSimulating
-│   │   │       CreateBandChoiceSimulating.py
-│   │   │       CreateBeeSimulating.py
-│   │   │       CreateDaltonianSimulating.py
-│   │   │       CreateHumanSimulating.py
-│   │   │       ICreateSimulator.py
-│   │   └───Simulating
-│   │           BandChoiceSimulating.py
-│   │           BeeSimulating.py
-│   │           DaltonianSimulating.py
-│   │           HumanSimulating.py
-│   │           SimulatingMethod.py
-├───Storage
-│   │   FileManager.py
-│   │   ImageManager.py
-└───Testing-Data
-    └───Egyptian_Statue
+├─Exceptions
+│ └─NotExistingBandException.py
+├─HMI
+│ ├─assets
+│ │ └─...
+│ ├─MainWindow.py
+│ └─SimulationChoiceWindow.py
+├─LogicLayer
+│ ├─Factory
+│ │ ├─CreateSimulating
+│ │ │ ├─ CreateBandChoiceSimulating.py
+│ │ │ ├─ CreateBeeSimulating.py
+│ │ │ ├─ CreateDaltonianSimulating.py
+│ │ │ ├─ CreateHumanSimulating.py
+│ │ │ └─ ICreateSimulator.py
+│ │ ├─Simulating
+│ │ │ ├─ BandChoiceSimulating.py
+│ │ │ ├─ BeeSimulating.py
+│ │ │ ├─ DaltonianSimulating.py
+│ │ │ ├─ HumanSimulating.py
+│ │ │ └─ SimulatingMethod.py
+│ └─└─SimulatorFactory.py
+│ ├─Band.py
+│ └─ImageMS.py
+├─Storage
+│ ├─FileManager.py
+│ └─ImageManager.py
+├─Testing-Data
+│ └─...
+├─.gitignore
+├─Program.py
+├─README.md
+└─setup.py
 ```
