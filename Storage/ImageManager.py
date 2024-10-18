@@ -1,9 +1,9 @@
-from LogicLayer.Reel import Reel
+from LogicLayer.Band import Band
 from LogicLayer.ImageMS import ImageMS
 
 class ImageManager : 
     """
-    Class ImageManager which allow to create instance of Image when they are loaded 
+    Class ImageManager which allows creating instances of Image when they are loaded 
     thanks to the FileManager class methods
 
     Author : Lakhdar Gibril
@@ -18,23 +18,23 @@ class ImageManager :
         pass 
 
     @staticmethod
-    def create_reel_instance(data : list) -> Reel : 
+    def create_band_instance(data: list) -> Band: 
         """
-        Method which allow to create a Reel class instance thanks to data found in the multispectral image
-        args : 
-            - data : list of mixed data for the Reel attributes. 
+        Method which allows creating a Band class instance thanks to data found in the multispectral image
+        args: 
+            - data: list of mixed data for the Band attributes.
 
         Author : Lakhdar Gibril
         """
-        reel = Reel(data[0],data[1],data[2])
-        return reel  
+        band = Band(data[0], data[1], data[2])
+        return band  
 
     @staticmethod
     def create_imagems_instance(data : list) -> ImageMS : 
         """
-        Method which allow to create a ImageMS class instance thanks to data found in the multispectral image
-        args : 
-            - data : list of mixed data for the ImageMS class attributes. 
+        Method which allows creating an ImageMS class instance thanks to data found in the multispectral image
+        args: 
+            - data: list of mixed data for the ImageMS class attributes.
 
         Author : Lakhdar Gibril
         """

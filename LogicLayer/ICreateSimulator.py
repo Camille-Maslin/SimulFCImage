@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from HMI.SimulatingMethod import SimulatingMethod 
+from LogicLayer.SimulatingMethod import SimulatingMethod 
 
 class SimulatorFactory(ABC):
     """

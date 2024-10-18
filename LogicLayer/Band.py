@@ -1,18 +1,18 @@
 import numpy as np
 
-class Reel : 
+class Band: 
     """
-    Class Reel which represent the reel of a multispecral image 
+    Class Band which represents the band of a multispectral image 
     
     Author : Lakhdar Gibril
     """
 
     def __init__(self, number : int, shade_of_grey : np.ndarray, wave_length : tuple) : 
         """
-        Natural constructor of the class Reel
-        args : 
-            - shade_of_length : an integer which represent the shade of grey, value between 0 and 255
-            - wave_length : represent the wave_length of the reel as a tuple of int
+        Natural constructor of the class Band
+        args: 
+            - shade_of_length: an integer which represents the shade of grey, value between 0 and 255
+            - wave_length: represents the wave_length of the band as a tuple of int
         
         Author : Lakhdar Gibril
         """
@@ -22,7 +22,7 @@ class Reel :
 
     def get_shade_of_grey (self) -> np.ndarray :
         """
-        Getter which allow to get the value of the shade of grey 
+        Getter which allow getting the value of the shade of grey 
         @return : the shade of grey as an integer
 
         Author : Lakhdar Gibril
@@ -32,8 +32,8 @@ class Reel :
 
     def get_wavelength (self) -> tuple : 
         """
-        Getter which allow to get the wavelength of the reel
-        @return : tuple of int containing two wavelength of the reel
+        Getter which allows getting the wavelength of the band
+        @return: tuple of int containing two wavelengths of the band
 
         Author : Lakhdar Gibril
         """
@@ -41,10 +41,9 @@ class Reel :
     
     def get_number(self) -> int : 
         """
-        Getter which allow to get the number of the reel
-        @return : the number of the reel as an int
+        Getter which allows getting the number of the band
+        @return: the number of the band as an int
 
         Author : Alexandre Moreau
         """
         return self.__number
-

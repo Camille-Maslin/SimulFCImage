@@ -67,8 +67,8 @@ class MainWindow(tk.Tk):
         self.image_name_label = tk.Label(image_data_frame, bg="white", font=("Arial", 12))
         self.image_name_label.pack(anchor="w")
 
-        self.reel_number_label = tk.Label(image_data_frame, bg="white", font=("Arial", 12))
-        self.reel_number_label.pack(anchor="w")
+        self.band_number_label = tk.Label(image_data_frame, bg="white", font=("Arial", 12))
+        self.band_number_label.pack(anchor="w")
 
         self.start_wavelength_label = tk.Label(image_data_frame, bg="white", font=("Arial", 12))
         self.start_wavelength_label.pack(anchor="w")
@@ -79,12 +79,12 @@ class MainWindow(tk.Tk):
         self.image_size_label = tk.Label(image_data_frame, bg="white", font=("Arial", 12))
         self.image_size_label.pack(anchor="w")
 
-        # Labels for current reel wavelength and number
-        self.reel_wavelength_label = tk.Label(image_data_frame, bg="white", font=("Arial", 12))
-        self.reel_wavelength_label.pack(anchor="w")
+        # Labels for current band wavelength and number
+        self.band_wavelength_label = tk.Label(image_data_frame, bg="white", font=("Arial", 12))
+        self.band_wavelength_label.pack(anchor="w")
 
-        self.reel_current_number_label = tk.Label(image_data_frame, bg="white", font=("Arial", 12))
-        self.reel_current_number_label.pack(anchor="w")
+        self.band_current_number_label = tk.Label(image_data_frame, bg="white", font=("Arial", 12))
+        self.band_current_number_label.pack(anchor="w")
 
         # Controls section for importing images and generating simulations
         controls_frame = tk.Frame(main_frame, bg="white")
@@ -108,9 +108,9 @@ class MainWindow(tk.Tk):
         imported_image_frame = tk.Frame(images_frame, bg="white")
         imported_image_frame.pack(side=tk.LEFT, padx=10, fill="both", expand=True)
 
-        # Label for the current reel wavelength
-        self.reel_wavelength_label = tk.Label(imported_image_frame, bg="white", font=("Arial", 12))
-        self.reel_wavelength_label.pack(pady=(5, 5))  # Space below the label
+        # Label for the current band wavelength
+        self.band_wavelength_label = tk.Label(imported_image_frame, bg="white", font=("Arial", 12))
+        self.band_wavelength_label.pack(pady=(5, 5))  # Space below the label
 
         # Label for "Imported Image"
         self.imported_image_label = tk.Label(imported_image_frame, bg="white", text="Imported Image", font=("Arial", 12))
@@ -125,17 +125,16 @@ class MainWindow(tk.Tk):
         navigation_frame.pack(pady=(10, 5))  # Space between the image and buttons
 
         # Previous/Next buttons for band navigation
-        self.prev_btn = ttk.Button(navigation_frame, text="Previous", command=self.__previous_reel, state='disabled')  # Set to disabled initially
+        self.prev_btn = ttk.Button(navigation_frame, text="Previous", command=self.__previous_band, state='disabled')  # Set to disabled initially
         self.prev_btn.pack(side=tk.LEFT, padx=10)
 
-        # Label and buttons for Current "Reel Number"
-        self.reel_current_number_text = tk.Text(navigation_frame, bg="white", font=("Arial", 12),width=3,height=1, state="disabled")
-        self.reel_current_number_text.pack(side=tk.LEFT, padx=10)
+        # Label and buttons for Current "Band Number"
+        self.band_current_number_text = tk.Text(navigation_frame, bg="white", font=("Arial", 12),width=3,height=1, state="disabled")
+        self.band_current_number_text.pack(side=tk.LEFT, padx=10)
+        self.band_total_number_label = tk.Label(navigation_frame, bg="white", font=("Arial", 12))
+        self.band_total_number_label.pack(side=tk.LEFT, padx=10)  
 
-        self.reel_total_number_label = tk.Label(navigation_frame,bg="white", font=("Arial",12))
-        self.reel_total_number_label.pack(side=tk.LEFT,padx=10)  
-
-        self.next_btn = ttk.Button(navigation_frame, text="Next", command=self.__next_reel, state='disabled')  # Set to disabled initially
+        self.next_btn = ttk.Button(navigation_frame, text="Next", command=self.__next_band, state='disabled')  # Set to disabled initially
         self.next_btn.pack(side=tk.LEFT, padx=10)
 
         # Frame for simulated image
@@ -160,7 +159,7 @@ class MainWindow(tk.Tk):
         self.image_label.config(image=self.img)  # Display the default image
 
         # Initialize the simulated image with a default image
-        self.simulated_image = self.load_image(self.default_image_path, size=(400, 400))  # Load the default image with size 400x400
+        self.simulated_image = self.load_image(self.default_image_path, size=(400, 400))  # Load the default image
         self.image_sim_label.config(image=self.simulated_image)  # Display the default image
 
         # Placeholder for logos
@@ -258,23 +257,24 @@ class MainWindow(tk.Tk):
 
             # Update the existing labels to show the image data
             self.image_name_label.config(text=f"Image name : {self.image_ms.get_name()}")  # Update the existing label
-            self.reel_number_label.config(text=f"Number of reels : {self.image_ms.get_number_reels()}")
+            self.band_number_label.config(text=f"Number of bands : {self.image_ms.get_number_bands()}")
             self.start_wavelength_label.config(text=f"Start wavelength : {self.image_ms.get_start_wavelength()}")
             self.end_wavelength_label.config(text=f"End wavelength : {self.image_ms.get_end_wavelength()}")
             self.image_size_label.config(text=f"Image size : {self.image_ms.get_size()[0]} x {self.image_ms.get_size()[1]}")
-            self.reel_total_number_label.config(text=f"/ {self.image_ms.get_number_reels()}")
+            self.band_total_number_label.config(text=f"/ {self.image_ms.get_number_bands()}")
+            
             # Enable the simulation buttons
             self.sim_btn.config(state='normal')  # Enable the button after image import
             self.prev_btn.config(state='normal')  # Enable the button after image import
             self.next_btn.config(state='normal')  # Enable the button after image import
 
-            self.reel_current_number_text.config(state='normal')
-            self.reel_current_number_text.bind('<Return>', self.__on_return_pressed)
+            self.band_current_number_text.config(state='normal')
+            self.band_current_number_text.bind('<Return>', self.__on_return_pressed)
             
             self.__update_data()
 
-            # Activer le bouton Save après la génération de l'image
-            self.save_btn.config(state='normal')  # Enable the Save button after image generation
+            # Enable the Save button after image generation
+            self.save_btn.config(state='normal')  
         except ValueError:
             tk.Label(dialog, text="Please enter valid values.", fg="red").grid(row=4, columnspan=2)
 
@@ -285,35 +285,35 @@ class MainWindow(tk.Tk):
         if self.image_path is not None:  # Ensure there is an image path before opening the window
             SimulationChoiceWindow(self, self.image_path)  # Pass image_path to SimulationChoiceWindow
             
-    def __next_reel(self):
+    def __next_band(self):
         """
-        Advances to the next reel and updates the displayed image and data.
+        Advances to the next band and updates the displayed image and data.
         """
-        self.image_ms.next_reel()
+        self.image_ms.next_band()
         self.__update_image()
         self.__update_data()
 
-    def __previous_reel(self):
+    def __previous_band(self):
         """
-        Goes back to the previous reel and updates the displayed image and data.
+        Goes back to the previous band and updates the displayed image and data.
         """
-        self.image_ms.previous_reel()
+        self.image_ms.previous_band()
         self.__update_image()
         self.__update_data()
 
     def __update_data(self):
         """
-        Updates the labels displaying the current reel wavelength and number.
+        Updates the labels displaying the current band wavelength and number.
         """
-        self.reel_wavelength_label.config(text=f"{self.image_ms.get_actualreel().get_wavelength()[0]} nm - {self.image_ms.get_actualreel().get_wavelength()[1]} nm")
-        self.reel_current_number_text.delete(1.0,tk.END)
-        self.reel_current_number_text.insert(tk.END,f"{self.image_ms.get_actualreel().get_number()}")
+        self.band_wavelength_label.config(text=f"{self.image_ms.get_actualband().get_wavelength()[0]} nm - {self.image_ms.get_actualband().get_wavelength()[1]} nm")
+        self.band_current_number_text.delete(1.0, tk.END)
+        self.band_current_number_text.insert(tk.END, f"{self.image_ms.get_actualband().get_number()}")
     
     def __update_image(self) : 
         """
         Update the image label due to the band change
         """ 
-        image = Image.fromarray(self.image_ms.get_actualreel().get_shade_of_grey())
+        image = Image.fromarray(self.image_ms.get_actualband().get_shade_of_grey())
         image = image.resize((400, 400))
 
         self.img = ImageTk.PhotoImage(image=image)
@@ -336,33 +336,29 @@ class MainWindow(tk.Tk):
         return ImageTk.PhotoImage(img)
     
     def __on_return_pressed(self, event):
-        reel_number = self.reel_current_number_text.get(1.0,tk.END)
-        try :
-            band = int(reel_number)
-            self.__change_reel(band)
-            
-        except (TypeError,ValueError):
-            messagebox.askokcancel("Input Error","The band number must be an integer, not a string !")
-
+        band_number = self.band_current_number_text.get(1.0, tk.END).strip()
+        try:
+            band = int(band_number)
+            self.__change_band(band)
+        except (TypeError, ValueError):
+            messagebox.askokcancel("Input Error", "The band number must be an integer, not a string!")
         finally:
-            self.reel_current_number_text.delete(1.0,tk.END)
+            self.band_current_number_text.delete(1.0, tk.END)
 
-    def __change_reel(self, reel_number:int): 
+    def __change_band(self, band_number: int):
         """
         Allow to change reel number with the input of the user
         Author : Lakhdar Gibril
         """
-        try :
-            if ((reel_number > self.image_ms.get_number_reels()) or (reel_number < 1)) : 
+        try:
+            if (band_number > self.image_ms.get_number_bands()) or (band_number < 1):
                 raise NotExistingBandException("The band is nonexistant")
-            
-            else :       
-                self.image_ms.set_actualreel(reel_number)
+            else:
+                self.image_ms.set_actualband(band_number)
                 self.__update_image()
                 self.__update_data()
-
-        except NotExistingBandException as exception :
-            messagebox.askokcancel("Input Error",exception.__str__())
+        except NotExistingBandException as exception:
+            messagebox.askokcancel("Input Error", exception.__str__())
 
     def quit_application(self):
         """

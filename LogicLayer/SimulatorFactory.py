@@ -1,6 +1,6 @@
 from typing import Dict, List
 from LogicLayer.ICreateSimulator import SimulatorFactory as ICreateSimulator
-from HMI.SimulatingMethod import SimulatingMethod
+from LogicLayer.SimulatingMethod import SimulatingMethod
 
 class SimulatorFactory:
     """

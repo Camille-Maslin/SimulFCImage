@@ -1,5 +1,5 @@
 from LogicLayer.ICreateSimulator import SimulatorFactory
-from HMI.BandChoiceSimulating import BandChoiceSimulating
+from LogicLayer.BandChoiceSimulating import BandChoiceSimulating
 
 class CreateBandChoiceSimulator(SimulatorFactory):
     def create_simulator(self, image_ms):
