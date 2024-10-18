@@ -1,4 +1,4 @@
-from LogicLayer.SimulatingMethod import SimulatingMethod
+from LogicLayer.Factory.Simulating.SimulatingMethod import SimulatingMethod
 
 class BandChoiceSimulating(SimulatingMethod):
     def __init__(self, image_ms):
