@@ -48,10 +48,14 @@ class FileManager :
 
         for filename in os.listdir(path):
             f = os.path.join(path, filename)
-            if os.path.isfile(f) and f.lower().endswith('.tiff'):
+            if os.path.isfile(f) and (f.lower().endswith('.tiff') or f.lower().endswith('.png') or f.lower().endswith('.jpg') or f.lower().endswith('.jpeg')):
                 with rasterio.open(f) as dataset:
                     wavelength = current_wavelength + step
-                    bands.append(ImageManager.create_band_instance([band_number, dataset.read(1), (current_wavelength, wavelength)]))
+                    if dataset.read(1).dtype == "uint16":
+                        image_data = (dataset.read(1)/256).astype("uint8")
+                    else:
+                        image_data = dataset.read(1)
+                    bands.append(ImageManager.create_band_instance([band_number, image_data, (current_wavelength, wavelength)]))
                     current_wavelength = wavelength
                     band_number += 1
 
