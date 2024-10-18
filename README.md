@@ -24,24 +24,24 @@ allowing users to perceive them in color. With its intuitive user interface, it 
 <h2>Project Architecture</h2>
 
 ```bash
-C:.
+S5_C1_LaBabaTcheam
 │   .gitignore
 │   Program.py
+│   README.md
 │   setup.py
-│
 ├───Exceptions
 │   │   NotExistingBandException.py
-│
+│   │
+│   └───__pycache__
+│           NotExistingBandException.cpython-311.pyc
 ├───HMI
 │   │   MainWindow.py
 │   │   SimulationChoiceWindow.py
-│   │
 │   ├───assets
 │   │       home-logo.png
 │   │       Logo-iut-dijon-auxerre-nevers.png
 │   │       Logo-laboratoire-ImViA.png
 │   │       no-image.1024x1024.png
-│
 ├───LogicLayer
 │   │   Band.py
 │   │   ImageMS.py
@@ -55,16 +55,15 @@ C:.
 │   │   │       CreateDaltonianSimulating.py
 │   │   │       CreateHumanSimulating.py
 │   │   │       ICreateSimulator.py
-│   │   │
 │   │   └───Simulating
 │   │           BandChoiceSimulating.py
 │   │           BeeSimulating.py
 │   │           DaltonianSimulating.py
 │   │           HumanSimulating.py
 │   │           SimulatingMethod.py
-│   │
-│
-└───Storage
-    │   FileManager.py
-    │   ImageManager.py
+├───Storage
+│   │   FileManager.py
+│   │   ImageManager.py
+└───Testing-Data
+    └───Egyptian_Statue
 ```
