@@ -40,7 +40,7 @@ allowing users to perceive them in color. With its intuitive user interface, it 
 <p>First, you need to install a few Python libraries. Run the following command in your command prompt (CMD): </p>
 
 ```bash
-pip install Pillow Asterio numpy cx_Freeze
+pip install Pillow rasterio numpy cx_Freeze
 ```
 
 <p>Once the installation is complete, you can compile the application by running the Program.py file.</p>
