@@ -1,8 +1,9 @@
 import tkinter as tk
-from tkinter import ttk, filedialog
+from tkinter import ttk, filedialog, messagebox
 from PIL import Image, ImageTk
 from Storage.FileManager import FileManager
 from HMI.SimulationChoiceWindow import SimulationChoiceWindow
+from Exceptions.NotExistingBandException import NotExistingBandException
 
 class MainWindow(tk.Tk):
     """
@@ -128,14 +129,11 @@ class MainWindow(tk.Tk):
         self.prev_btn.pack(side=tk.LEFT, padx=10)
 
         # Label and buttons for Current "Reel Number"
-        self.reel_current_number_label = tk.Text(navigation_frame, bg="white", font=("Arial", 12),width=3,height=1, state="disabled")
-        self.reel_current_number_label.pack(side=tk.LEFT, padx=10)
+        self.reel_current_number_text = tk.Text(navigation_frame, bg="white", font=("Arial", 12),width=3,height=1, state="disabled")
+        self.reel_current_number_text.pack(side=tk.LEFT, padx=10)
 
         self.reel_total_number_label = tk.Label(navigation_frame,bg="white", font=("Arial",12))
-        self.reel_total_number_label.pack(side=tk.LEFT,padx=10)
-
-        self.__select_reel_btn = ttk.Button(navigation_frame,text="Change reel", state="disabled",command=self.__change_reel)
-        self.__select_reel_btn.pack(side=tk.LEFT,padx=10,pady=10)     
+        self.reel_total_number_label.pack(side=tk.LEFT,padx=10)  
 
         self.next_btn = ttk.Button(navigation_frame, text="Next", command=self.__next_reel, state='disabled')  # Set to disabled initially
         self.next_btn.pack(side=tk.LEFT, padx=10)
@@ -228,11 +226,7 @@ class MainWindow(tk.Tk):
             except Exception as e:
                 print(f"Error loading image: {e}. line : {e.__traceback__.tb_lineno}")  # Print error message to console
                 self.image_label.config(text="Error loading image")  # Update label to show error
-        else:
-            self.image_label.config(text="No Image")  # Reset label if no image is selected
-            self.__display_default_image()  # Display the default PNG image
-            self.prev_btn.config(state='disabled')  # Disable buttons if no image is imported
-            self.next_btn.config(state='disabled')  # Disable buttons if no image is imported
+
 
     def on_submit(self, dialog: tk.Toplevel, start_entry: tk.Entry, end_entry: tk.Entry, step_entry: tk.Entry):
         """
@@ -253,12 +247,7 @@ class MainWindow(tk.Tk):
             # Continue with the image processing
             self.image_ms = FileManager.Load(self.folder_path, start_wavelength, end_wavelength, wavelength_step)
 
-            # Update the image_label to display the picture
-            image = Image.fromarray(self.image_ms.get_actualreel().get_shade_of_grey())
-            image = image.resize((400, 400))  # Resize to the same size as the imported image
-
-            self.img = ImageTk.PhotoImage(image=image)
-            self.image_label.config(image=self.img, text="")
+            self.__update_image()
 
             # Update the simulated image with a default image
             self.simulated_image = self.load_image(self.default_image_path, size=(400, 400))  # Load the default image
@@ -278,9 +267,9 @@ class MainWindow(tk.Tk):
             self.sim_btn.config(state='normal')  # Enable the button after image import
             self.prev_btn.config(state='normal')  # Enable the button after image import
             self.next_btn.config(state='normal')  # Enable the button after image import
-            self.__select_reel_btn.config(state='normal')
 
-            self.reel_current_number_label.config(state='normal')
+            self.reel_current_number_text.config(state='normal')
+            self.reel_current_number_text.bind('<Return>')
             
             self.__update_data()
 
@@ -301,11 +290,7 @@ class MainWindow(tk.Tk):
         Advances to the next reel and updates the displayed image and data.
         """
         self.image_ms.next_reel()
-        image = Image.fromarray(self.image_ms.get_actualreel().get_shade_of_grey())
-        image = image.resize((400, 400))
-
-        self.img = ImageTk.PhotoImage(image=image)
-        self.image_label.config(image=self.img, text="")
+        self.__update_image()
         self.__update_data()
 
     def __previous_reel(self):
@@ -313,11 +298,7 @@ class MainWindow(tk.Tk):
         Goes back to the previous reel and updates the displayed image and data.
         """
         self.image_ms.previous_reel()
-        image = Image.fromarray(self.image_ms.get_actualreel().get_shade_of_grey())
-        image = image.resize((400, 400))
-
-        self.img = ImageTk.PhotoImage(image=image)
-        self.image_label.config(image=self.img, text="")
+        self.__update_image()
         self.__update_data()
 
     def __update_data(self):
@@ -325,8 +306,19 @@ class MainWindow(tk.Tk):
         Updates the labels displaying the current reel wavelength and number.
         """
         self.reel_wavelength_label.config(text=f"{self.image_ms.get_actualreel().get_wavelength()[0]} nm - {self.image_ms.get_actualreel().get_wavelength()[1]} nm")
-        self.reel_current_number_label.delete(1.0,tk.END)
-        self.reel_current_number_label.insert(tk.END,f"{self.image_ms.get_actualreel().get_number()}")
+        self.reel_current_number_text.delete(1.0,tk.END)
+        self.reel_current_number_text.insert(tk.END,f"{self.image_ms.get_actualreel().get_number()}")
+    
+    def __update_image(self) : 
+        """
+        Update the image label due to the band change
+        """ 
+        image = Image.fromarray(self.image_ms.get_actualreel().get_shade_of_grey())
+        image = image.resize((400, 400))
+
+        self.img = ImageTk.PhotoImage(image=image)
+        self.image_label.config(image=self.img, text="")
+
 
     def load_image(self, path, size=(400, 400)):  # Default size
         """
@@ -346,16 +338,20 @@ class MainWindow(tk.Tk):
     def __change_reel(self) : 
         """
         Allow to change reel number with the input of the user
+        Author : Lakhdar Gibril
         """
-        reel_number = int(self.reel_current_number_label.get(1.0,tk.END))
-        if (reel_number <= self.image_ms.get_number_reels()) :
-            self.image_ms.set_actualreel(reel_number)
-            image = Image.fromarray(self.image_ms.get_actualreel().get_shade_of_grey())
-            image = image.resize((400, 400))
+        reel_number = self.reel_current_number_text.get(1.0,tk.END)
+        try :
+            if ((reel_number.isdigit() != True) or (int(reel_number) > self.image_ms.get_number_reels())) : 
+                raise NotExistingBandException("The band is nonexistant")
+            
+            else :       
+                self.image_ms.set_actualreel(reel_number)
+                self.__update_image()
+                self.__update_data()
 
-            self.img = ImageTk.PhotoImage(image=image)
-            self.image_label.config(image=self.img, text="")
-            self.__update_data()
+        except NotExistingBandException as exception :
+            messagebox.askokcancel("Input Error",exception.__str__())
 
     def quit_application(self):
         """
