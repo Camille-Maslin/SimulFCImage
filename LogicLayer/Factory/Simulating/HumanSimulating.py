@@ -1,4 +1,4 @@
-from LogicLayer.Factory.Simulating.SimulatingMethod import SimulatingMethod
+from LogicLayer.Factory.Simulating import SimulatingMethod
 
 class HumanSimulating(SimulatingMethod):
     def __init__(self, image_ms):

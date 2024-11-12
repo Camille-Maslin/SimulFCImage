@@ -11,7 +11,7 @@ class SimulateMethod(ABC):
         Constructor to initialize the multispectral image.
 
         Args:
-            image_ms: An ImageMS object representing the multispectral image to simulate.
+            image_ms (ImageMS): An ImageMS object representing the multispectral image to simulate.
         """
         self._image_ms = image_ms
 
