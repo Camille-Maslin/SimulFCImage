@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from LogicLayer import ImageMS 
 
 class SimulationChoiceWindow(tk.Toplevel):
     """
@@ -9,7 +10,7 @@ class SimulationChoiceWindow(tk.Toplevel):
     Author : Camille Maslin  
     """
 
-    def __init__(self, parent : tk.Tk, image_path : str): 
+    def __init__(self, parent : tk.Tk, image_ms : ImageMS): 
         """
         Constructor of SimulationChoiceWindow class where we initialize the window parameters
         like the title, the size and widgets   
@@ -17,27 +18,21 @@ class SimulationChoiceWindow(tk.Toplevel):
         Parameters :
             - parent : a parent window which inherit on the tk.Tk class
             - image_path (str) : the image path as a string selected in the MainWindow
+            - 
 
         Author : Camille Maslin
         """
         super().__init__(parent)
-        self.image_path = image_path  # Store the image_path
-        self.title("Select Simulation Method")
+        self.__image_ms = image_ms  # Store the image_path
+        self.title("Choose a simulation method")
         self.geometry("400x300")
 
         self.__initialize_widgets()
 
-    def __initialize_widgets (self) -> None : 
-        # Dropdown for selecting simulation
-        self.sim_type = tk.StringVar(self)
-        self.sim_type.set("True Color")  # Set "True Color" as the default selection
+    def __initialize_widgets (self) : 
+        # Creating a frame to contain a grid
+        self.__frame = tk.Frame(self, bg="white")
+        self.__frame.grid(sticky="nsew")
 
-        sim_options = ["True Color", "False Color", "Daltonism Simulation", "Bee Color Simulation"]
-        ttk.Label(self, text="Select a Simulation Method", font=("Arial", 14)).pack(pady=20)
-        ttk.OptionMenu(self, self.sim_type, "True Color", *sim_options).pack(pady=10)  # Ensure "True Color" is always displayed
-
-        # Proceed Button
-        proceed_btn = ttk.Button(self, text="Proceed", command=self.__proceed)
-        proceed_btn.pack(pady=10)
-
-    
+        self.__frame.columnconfigure([0, 1, 2, 3], weight = 1)
+        self.__frame.rowconfigure([])
