@@ -1,25 +1,26 @@
 from abc import ABC, abstractmethod
+from LogicLayer import ImageMS
 
 class SimulateMethod(ABC):
     """
-    Classe abstraite pour définir une méthode de simulation.
+    Abstract class to define a simulation method.
     """
 
-    def __init__(self, image_ms):
+    def __init__(self, image_ms : ImageMS):
         """
-        Constructeur pour initialiser l'image multispectrale.
+        Constructor to initialize the multispectral image.
 
         Args:
-            image_ms: Un objet ImageMS représentant l'image multispectrale à simuler.
+            image_ms: An ImageMS object representing the multispectral image to simulate.
         """
-        self.image_ms = image_ms
+        self._image_ms = image_ms
 
     @abstractmethod
     def simulate(self):
         """
-        Méthode abstraite pour simuler une image.
+        Abstract method to simulate an image.
 
         Returns:
-            Les données de l'image simulée.
+            The simulated image data.
         """
         pass

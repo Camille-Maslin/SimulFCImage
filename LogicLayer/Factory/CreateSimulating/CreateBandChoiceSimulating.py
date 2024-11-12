@@ -1,7 +1,7 @@
-from LogicLayer.Factory.CreateSimulating.ICreateSimulator import SimulatorFactory
+from LogicLayer.Factory.CreateSimulating import ICreateSimulator 
 from LogicLayer.Factory.Simulating.BandChoiceSimulating import BandChoiceSimulating
 
-class CreateBandChoiceSimulator(SimulatorFactory):
+class CreateBandChoiceSimulator(ICreateSimulator):
     def create_simulator(self, image_ms):
         """
         Create a simulator for band choice.
