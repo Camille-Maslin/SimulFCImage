@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from LogicLayer.Factory.Simulating.SimulatingMethod import SimulatingMethod 
+from LogicLayer.Factory.Simulating import SimulatingMethod 
 
-class SimulatorFactory(ABC):
+class ICreateSimulator(ABC):
     """
     Interface to create simulation methods.
     """
