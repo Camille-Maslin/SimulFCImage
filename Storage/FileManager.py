@@ -38,7 +38,7 @@ class FileManager :
         bands = []
         for num_band in range (1,image.n_frames) :
             image.seek(num_band) # Allow to go to the specified band
-            band_shade = np.array(image) * 255 # Allow to get a value between 0 and 255
+            band_shade = np.array(image)/2**8 # Convert image 24 bit to 8 bit
             # We don't know how to get the wavelenght data so it is an empty tuple for now
             band = ImageManager.create_band_instance([num_band,band_shade,(1,1)]) 
             bands.append(band) 
