@@ -24,30 +24,82 @@ class FileManager :
         pass
 
     @staticmethod
-    def Load(path : str) -> ImageMS : 
+    def Load(image_path: str, metadata_path: str) -> ImageMS:
         """
-        Static method which allows loading an Image from a directory selected by the user 
-        args : 
-            - path (str) : represent the path of the image as a string
-        @return : an ImageMS object
+        Static method which allows loading an Image and its metadata from files selected by the user 
+        """
+        try:
+            # Load the image
+            print(f"Loading image from: {image_path}")
+            image = Image.open(image_path)
+            bands = []
+            
+            # Read wavelengths from metadata file
+            print(f"Loading metadata from: {metadata_path}")
+            wavelengths = []
+            
+            with open(metadata_path, 'r') as f:
+                found_wavelengths = False
+                for line in f:
+                    if 'Center wavelengths:' in line:
+                        print("Found Center wavelengths section")
+                        found_wavelengths = True
+                        continue
+                    if found_wavelengths and line.strip() and line.startswith('\t\t'):
+                        try:
+                            values = [float(val) for val in line.strip().split()]
+                            wavelengths.extend(values)
+                            print(f"Added wavelengths: {values}")
+                        except ValueError as e:
+                            print(f"Error parsing wavelengths from line: {line.strip()}")
+                            print(f"Error details: {str(e)}")
+                    elif found_wavelengths and not line.startswith('\t\t'):
+                        break
+                    
+            print(f"Total wavelengths found: {len(wavelengths)}")
+            
+            if not wavelengths:
+                raise ValueError("No wavelength data found in the metadata file")
+            
+            # Create bands with corresponding wavelengths
+            print(f"Creating bands for image with {image.n_frames} frames")
+            # Skip first frame/band as it's not relevant
+            for num_band in range(1, image.n_frames):
+                try:
+                    image.seek(num_band)  # Get the band data
+                    band_shade = np.array(image)
+                    if(image.mode == 'F'):
+                        band_shade = np.array(image)*255
+                    elif(image.mode == 'I;16'):
+                        band_shade = np.array(image)/2**8
+                    
+                    # Use num_band - 1 to align with wavelengths array
+                    wavelength_index = num_band - 1
+                    band = ImageManager.create_band_instance([
+                        num_band,  # Keep original band number
+                        band_shade,
+                        (wavelengths[wavelength_index], wavelengths[wavelength_index])
+                    ])
+                    bands.append(band)
+                    print(f"Created band {num_band} with wavelength {wavelengths[wavelength_index]}")
+                except Exception as e:
+                    print(f"Error creating band {num_band}: {str(e)}")
+                    raise
 
-        Author: Alexis Paris
-        Author : Lakhdar Gibril
-        """ 
-        image = Image.open(path)
-        bands = []
-        for num_band in range (1,image.n_frames) :
-            image.seek(num_band) # Allow to go to the specified band
-            band_shade = np.array(image)
-            if(image.mode == 'F'):
-                band_shade = np.array(image)*255 # Allow to get a value between 0 and 255
-            elif(image.mode == 'I;16'):
-                band_shade = np.array(image)/2**8 # Convert image 16 bit to 8 bit
-            # We don't know how to get the wavelenght data so it is an empty tuple for now
-            band = ImageManager.create_band_instance([num_band,band_shade,(1,1)]) 
-            bands.append(band) 
-        # We don't know how to get the wavelenght data so it is just 0 for start and end wavelenght for now
-        image_ms = ImageManager.create_imagems_instance([path,0,0,image.size,bands])
-        return image_ms     
+            start_wavelength = wavelengths[0]
+            end_wavelength = wavelengths[-1]
+            print(f"Start wavelength: {start_wavelength}, End wavelength: {end_wavelength}")
+            
+            image_ms = ImageManager.create_imagems_instance([image_path, start_wavelength, end_wavelength, image.size, bands])
+            print("Successfully created ImageMS instance")
+            return image_ms
+            
+        except Exception as e:
+            print(f"Error in Load method: {str(e)}")
+            print(f"Error type: {type(e)}")
+            import traceback
+            print("Full traceback:")
+            traceback.print_exc()
+            raise
 
         

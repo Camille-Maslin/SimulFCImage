@@ -4,6 +4,7 @@ from PIL import Image, ImageTk
 from Storage.FileManager import FileManager
 from HMI.SimulationChoiceWindow import SimulationChoiceWindow
 from Exceptions.NotExistingBandException import NotExistingBandException
+import os
 
 class MainWindow(tk.Tk):
     """
@@ -186,42 +187,77 @@ class MainWindow(tk.Tk):
 
     def __import_image(self):
         """
-        Opens a dialog to import an image and prompts the user to enter wavelength parameters.
+        Opens dialogs to import both the image and its wavelength metadata file.
         """
-        self.__folder_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.tiff;*.tif")])
-        if self.__folder_path:
-            try:
-                # Continue with the image processing
-                self.__image_ms = FileManager.Load(self.__folder_path)
-                self.__update_image()
-                # Update the label to show the name of the imported image
-                self.title(f"SimulFCImage - {self.__image_ms.get_name()}")
-                # Update the existing labels to show the image data
-                self.__image_name_label.config(text=f"Image name : {self.__image_ms.get_name()}")  # Update the existing label
-                self.__band_number_label.config(text=f"Number of bands : {self.__image_ms.get_number_bands()}")
-                self.__start_wavelength_label.config(text=f"Start wavelength : {self.__image_ms.get_start_wavelength()}")
-                self.__end_wavelength_label.config(text=f"End wavelength : {self.__image_ms.get_end_wavelength()}")
-                self.__image_size_label.config(text=f"Image size : {self.__image_ms.get_size()[0]} x {self.__image_ms.get_size()[1]}")
-                self.__band_total_number_label.config(text=f"/ {self.__image_ms.get_number_bands()}")
-                # Enable the simulation buttons
-                self.__sim_btn.config(state='normal')  # Enable the button after image import
-                self.__prev_btn.config(state='normal')  # Enable the button after image import
-                self.__next_btn.config(state='normal')  # Enable the button after image import
-                self.__band_current_number_text.config(state='normal')
-                self.__band_current_number_text.bind('<Return>', self.__on_return_pressed)
-                self.__update_data()
-                # Enable the Save button after image generation
-                self.__save_btn.config(state='normal')  
-            except ValueError:
-                tk.Label(self, text="Please enter valid values.", fg="red").grid(row=4, columnspan=2)
+        try:
+            print("Opening file dialog for image selection")
+            self.__folder_path = filedialog.askopenfilename(
+                title="Select the image file",
+                filetypes=[("Image Files", "*.tiff;*.tif")]
+            )
+            
+            if self.__folder_path:
+                print(f"Selected image file: {self.__folder_path}")
+                # Ask for the metadata file
+                metadata_path = filedialog.askopenfilename(
+                    title="Select the wavelength metadata file",
+                    filetypes=[("Text Files", "*.txt")],
+                    initialdir=os.path.dirname(self.__folder_path)
+                )
+                
+                if metadata_path:
+                    print(f"Selected metadata file: {metadata_path}")
+                    try:
+                        self.__image_ms = FileManager.Load(self.__folder_path, metadata_path)
+                        self.__update_image()
+                        
+                        # Update window title and labels
+                        print("Updating interface with image information")
+                        self.title(f"SimulFCImage - {self.__image_ms.get_name()}")
+                        self.__image_name_label.config(text=f"Image name : {self.__image_ms.get_name()}")
+                        self.__band_number_label.config(text=f"Number of bands : {self.__image_ms.get_number_bands()}")
+                        self.__start_wavelength_label.config(text=f"Start wavelength : {self.__image_ms.get_start_wavelength():.2f} nm")
+                        self.__end_wavelength_label.config(text=f"End wavelength : {self.__image_ms.get_end_wavelength():.2f} nm")
+                        self.__image_size_label.config(text=f"Image size : {self.__image_ms.get_size()[0]} x {self.__image_ms.get_size()[1]}")
+                        self.__band_total_number_label.config(text=f"/ {self.__image_ms.get_number_bands()}")
+                        
+                        # Enable buttons
+                        print("Enabling interface buttons")
+                        self.__sim_btn.config(state='normal')
+                        self.__prev_btn.config(state='normal')
+                        self.__next_btn.config(state='normal')
+                        self.__band_current_number_text.config(state='normal')
+                        self.__band_current_number_text.bind('<Return>', self.__on_return_pressed)
+                        self.__update_data()
+                        self.__save_btn.config(state='normal')
+                        
+                    except Exception as e:
+                        print(f"Error during image loading: {str(e)}")
+                        print(f"Error type: {type(e)}")
+                        import traceback
+                        traceback.print_exc()
+                        messagebox.showerror("Error", f"An error occurred while loading the files: {str(e)}")
+                else:
+                    print("No metadata file selected")
+                    messagebox.showwarning("Warning", "Metadata file is required. Import cancelled.")
+            else:
+                print("No image file selected")
+                
+        except Exception as e:
+            print(f"Unexpected error in import_image: {str(e)}")
+            print(f"Error type: {type(e)}")
+            import traceback
+            traceback.print_exc()
 
     def __open_simulation_choice(self):
         """
         Opens the simulation choice window if an image has been imported.
         """
-        if self.__image_path is not None:  # Ensure there is an image path before opening the window
-            SimulationChoiceWindow(self, self.__image_path)  # Pass image_path to SimulationChoiceWindow
-            
+        if self.__image_ms is not None:
+            SimulationChoiceWindow(self, self.__image_ms)
+        else:
+            messagebox.showwarning("Warning", "Please import an image first.")
+
     def __next_band(self):
         """
         Advances to the next band and updates the displayed image and data.
@@ -242,7 +278,7 @@ class MainWindow(tk.Tk):
         """
         Updates the labels displaying the current band wavelength and number.
         """
-        self.__band_wavelength_label.config(text=f"{self.__image_ms.get_actualband().get_wavelength()[0]} nm - {self.__image_ms.get_actualband().get_wavelength()[1]} nm")
+        self.__band_wavelength_label.config(text=f"{self.__image_ms.get_actualband().get_wavelength()[0]:.2f} nm")
         self.__band_current_number_text.delete(1.0, tk.END)
         self.__band_current_number_text.insert(tk.END, f"{self.__image_ms.get_actualband().get_number()}")
     

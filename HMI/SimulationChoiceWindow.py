@@ -17,8 +17,7 @@ class SimulationChoiceWindow(tk.Toplevel):
 
         Parameters :
             - parent : a parent window which inherit on the tk.Tk class
-            - image_path (str) : the image path as a string selected in the MainWindow
-            - 
+            - image_ms : ImageMS object containing the loaded image data
 
         Author : Camille Maslin
         """
@@ -29,10 +28,13 @@ class SimulationChoiceWindow(tk.Toplevel):
 
         self.__initialize_widgets()
 
-    def __initialize_widgets (self) : 
+    def __initialize_widgets(self): 
         # Creating a frame to contain a grid
         self.__frame = tk.Frame(self, bg="white")
         self.__frame.grid(sticky="nsew")
 
-        self.__frame.columnconfigure([0, 1, 2, 3], weight = 1)
-        self.__frame.rowconfigure([])
+        # Configure columns
+        self.__frame.columnconfigure([0, 1, 2, 3], weight=1)
+        
+        # Configure rows
+        self.__frame.rowconfigure([0, 1, 2], weight=1)
