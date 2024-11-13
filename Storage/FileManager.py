@@ -1,6 +1,6 @@
 from LogicLayer.ImageMS import ImageMS
-import rasterio
-import os
+from PIL import Image 
+import numpy as np
 from Storage.ImageManager import ImageManager
 
 class FileManager : 
@@ -24,38 +24,26 @@ class FileManager :
         pass
 
     @staticmethod
-    def Load(path : str, start_wavelength : int, end_wavelength : int, step : int) -> ImageMS : 
+    def Load(path : str) -> ImageMS : 
         """
         Static method which allows loading an Image from a directory selected by the user 
-        Parameters : 
-            path: represent the path of the image as a string
-            start_wavelength: int which means the begin wavelength of the image
-            end_wavelength: int which specify the ending wavelength of the image
-            step: int number which allows to say the step numbers between bands
-        @return: an ImageMS object
+        args : 
+            - path (str) : represent the path of the image as a string
+        @return : an ImageMS object
 
         Author: Alexis Paris
+        Author : Lakhdar Gibril
         """ 
-        current_wavelength = start_wavelength
+        image = Image.open(path)
         bands = []
-        image = None
-        band_number = 1
+        for num_band in range (1,image.n_frames) :
+            image.seek(num_band) # Allow to go to the specified band
+            band_shade = np.array(image) * 255 # Allow to get a value between 0 and 255
+            # We don't know how to get the wavelenght data so it is an empty tuple for now
+            band = ImageManager.create_band_instance([num_band,band_shade,(1,1)]) 
+            bands.append(band) 
+        # We don't know how to get the wavelenght data so it is just 0 for start and end wavelenght for now
+        image_ms = ImageManager.create_imagems_instance([path,0,0,image.size,bands])
+        return image_ms     
 
-        for filename in os.listdir(path):
-            f = os.path.join(path, filename)
-            if os.path.isfile(f) and (f.lower().endswith('.tiff') or f.lower().endswith('.png') or f.lower().endswith('.jpg') or f.lower().endswith('.jpeg')):
-                with rasterio.open(f) as dataset:
-                    wavelength = current_wavelength + step
-                    if dataset.read(1).dtype == "uint16":
-                        image_data = (dataset.read(1)/256).astype("uint8")
-                    else:
-                        image_data = dataset.read(1)
-                    bands.append(ImageManager.create_band_instance([band_number, image_data, (current_wavelength, wavelength)]))
-                    current_wavelength = wavelength
-                    band_number += 1
-
-        height, width = dataset.shape
-
-        imageData = [path, start_wavelength, end_wavelength, (height, width), bands]
-        image = ImageManager.create_imagems_instance(imageData)
-        return image
+        

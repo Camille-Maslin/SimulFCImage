@@ -188,83 +188,32 @@ class MainWindow(tk.Tk):
         """
         Opens a dialog to import an image and prompts the user to enter wavelength parameters.
         """
-        self.__folder_path = filedialog.askdirectory()
+        self.__folder_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.tiff;*.tif")])
         if self.__folder_path:
             try:
-                # Create a custom dialog window
-                dialog = tk.Toplevel(self)
-                dialog.title("Enter the wavelengths")
-
-                tk.Label(dialog, text="Start wavelength:").grid(row=0, column=0, padx=10, pady=5)
-                start_entry = tk.Entry(dialog)
-                start_entry.grid(row=0, column=1, padx=10, pady=5)
-
-                tk.Label(dialog, text="End wavelength:").grid(row=1, column=0, padx=10, pady=5)
-                end_entry = tk.Entry(dialog)
-                end_entry.grid(row=1, column=1, padx=10, pady=5)
-
-                tk.Label(dialog, text="Wavelength step:").grid(row=2, column=0, padx=10, pady=5)
-                step_entry = tk.Entry(dialog)
-                step_entry.grid(row=2, column=1, padx=10, pady=5)
-
-                submit_btn = ttk.Button(dialog, text="Submit", command=lambda: self.__on_submit(dialog, start_entry, end_entry, step_entry))
-                submit_btn.grid(row=3, columnspan=2, pady=10)
-
-                dialog.transient(self)
-                dialog.grab_set()
-                self.wait_window(dialog)
-
-                self.__image_path = self.__folder_path  # Update the path of the imported image
-
-            except Exception :
-                messagebox.askokcancel("Loading Error","Error loading image")
-
-    def __on_submit(self, dialog: tk.Toplevel, start_entry: tk.Entry, end_entry: tk.Entry, step_entry: tk.Entry):
-        """
-        Processes the wavelength parameters entered by the user and updates the image display accordingly.
-
-        Parameters:
-        - dialog: The dialog window for entering wavelengths.
-        - start_entry: Entry widget for the start wavelength.
-        - end_entry: Entry widget for the end wavelength.
-        - step_entry: Entry widget for the wavelength step.
-        """
-        try:
-            start_wavelength = int(start_entry.get())
-            end_wavelength = int(end_entry.get())
-            wavelength_step = int(step_entry.get())
-            dialog.destroy()
-
-            # Continue with the image processing
-            self.__image_ms = FileManager.Load(self.__folder_path, start_wavelength, end_wavelength, wavelength_step)
-
-            self.__update_image()
-
-            # Update the label to show the name of the imported image
-            self.title(f"SimulFCImage - {self.__image_ms.get_name()}")
-
-            # Update the existing labels to show the image data
-            self.__image_name_label.config(text=f"Image name : {self.__image_ms.get_name()}")  # Update the existing label
-            self.__band_number_label.config(text=f"Number of bands : {self.__image_ms.get_number_bands()}")
-            self.__start_wavelength_label.config(text=f"Start wavelength : {self.__image_ms.get_start_wavelength()}")
-            self.__end_wavelength_label.config(text=f"End wavelength : {self.__image_ms.get_end_wavelength()}")
-            self.__image_size_label.config(text=f"Image size : {self.__image_ms.get_size()[0]} x {self.__image_ms.get_size()[1]}")
-            self.__band_total_number_label.config(text=f"/ {self.__image_ms.get_number_bands()}")
-            
-            # Enable the simulation buttons
-            self.__sim_btn.config(state='normal')  # Enable the button after image import
-            self.__prev_btn.config(state='normal')  # Enable the button after image import
-            self.__next_btn.config(state='normal')  # Enable the button after image import
-
-            self.__band_current_number_text.config(state='normal')
-            self.__band_current_number_text.bind('<Return>', self.__on_return_pressed)
-            
-            self.__update_data()
-
-            # Enable the Save button after image generation
-            self.__save_btn.config(state='normal')  
-        except ValueError:
-            tk.Label(dialog, text="Please enter valid values.", fg="red").grid(row=4, columnspan=2)
+                # Continue with the image processing
+                self.__image_ms = FileManager.Load(self.__folder_path)
+                self.__update_image()
+                # Update the label to show the name of the imported image
+                self.title(f"SimulFCImage - {self.__image_ms.get_name()}")
+                # Update the existing labels to show the image data
+                self.__image_name_label.config(text=f"Image name : {self.__image_ms.get_name()}")  # Update the existing label
+                self.__band_number_label.config(text=f"Number of bands : {self.__image_ms.get_number_bands()}")
+                self.__start_wavelength_label.config(text=f"Start wavelength : {self.__image_ms.get_start_wavelength()}")
+                self.__end_wavelength_label.config(text=f"End wavelength : {self.__image_ms.get_end_wavelength()}")
+                self.__image_size_label.config(text=f"Image size : {self.__image_ms.get_size()[0]} x {self.__image_ms.get_size()[1]}")
+                self.__band_total_number_label.config(text=f"/ {self.__image_ms.get_number_bands()}")
+                # Enable the simulation buttons
+                self.__sim_btn.config(state='normal')  # Enable the button after image import
+                self.__prev_btn.config(state='normal')  # Enable the button after image import
+                self.__next_btn.config(state='normal')  # Enable the button after image import
+                self.__band_current_number_text.config(state='normal')
+                self.__band_current_number_text.bind('<Return>', self.__on_return_pressed)
+                self.__update_data()
+                # Enable the Save button after image generation
+                self.__save_btn.config(state='normal')  
+            except ValueError:
+                tk.Label(self, text="Please enter valid values.", fg="red").grid(row=4, columnspan=2)
 
     def __open_simulation_choice(self):
         """
