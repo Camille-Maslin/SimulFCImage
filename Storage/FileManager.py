@@ -3,10 +3,15 @@ from PIL import Image
 import numpy as np
 from Storage.ImageManager import ImageManager
 
+
 class FileManager : 
     """
     Class FileManager which allow to save or load a multispectral image
     """
+    SHADE_OF_GREY : chr = 'F' # An image in a shade of grey, so an 8 bits image
+    _16BIT_IMAGE : chr = 'I;16'
+    NUMBER_TO_CONVERT_TO_8BITS : int = 256 
+    MAX_COLOR_BITS : int = 255
 
     def __init__(self) : 
         """
@@ -73,10 +78,10 @@ class FileManager :
                 try:
                     image.seek(num_band)  # Get the band data
                     band_shade = np.array(image)
-                    if(image.mode == 'F'):
-                        band_shade = np.array(image)*255
-                    elif(image.mode == 'I;16'):
-                        band_shade = np.array(image)/2**8
+                    if(image.mode == FileManager.SHADE_OF_GREY):
+                        band_shade = np.array(image)*FileManager.MAX_COLOR_BITS
+                    elif(image.mode == FileManager._16BIT_IMAGE):
+                        band_shade = np.array(image)/FileManager.NUMBER_TO_CONVERT_TO_8BITS
                     
                     # Use num_band - 1 to align with wavelengths array
                     wavelength_index = num_band - 1
