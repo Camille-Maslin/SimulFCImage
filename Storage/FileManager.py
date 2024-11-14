@@ -37,11 +37,16 @@ class FileManager :
             # Read wavelengths from metadata file
             print(f"Loading metadata from: {metadata_path}")
             wavelengths = []
-            
             with open(metadata_path, 'r') as f:
                 found_wavelengths = False
+                found_image = False
+                image_path_last = image_path.split('/')[-1]
                 for line in f:
-                    if 'Center wavelengths:' in line:
+                    if image_path_last+":" in line:
+                        print("Found ",image_path_last," section")
+                        found_image = True
+                        continue
+                    if found_image and 'Center wavelengths:' in line:
                         print("Found Center wavelengths section")
                         found_wavelengths = True
                         continue
