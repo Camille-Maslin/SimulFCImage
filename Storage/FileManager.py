@@ -1,6 +1,6 @@
 from LogicLayer.ImageMS import ImageMS
-import rasterio
-import os
+from PIL import Image 
+import numpy as np
 from Storage.ImageManager import ImageManager
 
 class FileManager : 
@@ -24,38 +24,87 @@ class FileManager :
         pass
 
     @staticmethod
-    def Load(path : str, start_wavelength : int, end_wavelength : int, step : int) -> ImageMS : 
+    def Load(image_path: str, metadata_path: str) -> ImageMS:
         """
-        Static method which allows loading an Image from a directory selected by the user 
-        Parameters : 
-            path: represent the path of the image as a string
-            start_wavelength: int which means the begin wavelength of the image
-            end_wavelength: int which specify the ending wavelength of the image
-            step: int number which allows to say the step numbers between bands
-        @return: an ImageMS object
+        Static method which allows loading an Image and its metadata from files selected by the user 
+        """
+        try:
+            # Load the image
+            print(f"Loading image from: {image_path}")
+            image = Image.open(image_path)
+            bands = []
+            
+            # Read wavelengths from metadata file
+            print(f"Loading metadata from: {metadata_path}")
+            wavelengths = []
+            with open(metadata_path, 'r') as f:
+                found_wavelengths = False
+                found_image = False
+                image_path_last = image_path.split('/')[-1]
+                for line in f:
+                    if image_path_last+":" in line:
+                        print("Found ",image_path_last," section")
+                        found_image = True
+                        continue
+                    if found_image and 'Center wavelengths:' in line:
+                        print("Found Center wavelengths section")
+                        found_wavelengths = True
+                        continue
+                    if found_wavelengths and line.strip() and line.startswith('\t\t'):
+                        try:
+                            values = [float(val) for val in line.strip().split()]
+                            wavelengths.extend(values)
+                            print(f"Added wavelengths: {values}")
+                        except ValueError as e:
+                            print(f"Error parsing wavelengths from line: {line.strip()}")
+                            print(f"Error details: {str(e)}")
+                    elif found_wavelengths and not line.startswith('\t\t'):
+                        break
+                    
+            print(f"Total wavelengths found: {len(wavelengths)}")
+            
+            if not wavelengths:
+                raise ValueError("No wavelength data found in the metadata file")
+            
+            # Create bands with corresponding wavelengths
+            print(f"Creating bands for image with {image.n_frames} frames")
+            # Skip first frame/band as it's not relevant
+            for num_band in range(1, image.n_frames):
+                try:
+                    image.seek(num_band)  # Get the band data
+                    band_shade = np.array(image)
+                    if(image.mode == 'F'):
+                        band_shade = np.array(image)*255
+                    elif(image.mode == 'I;16'):
+                        band_shade = np.array(image)/2**8
+                    
+                    # Use num_band - 1 to align with wavelengths array
+                    wavelength_index = num_band - 1
+                    band = ImageManager.create_band_instance([
+                        num_band,  # Keep original band number
+                        band_shade,
+                        (wavelengths[wavelength_index], wavelengths[wavelength_index])
+                    ])
+                    bands.append(band)
+                    print(f"Created band {num_band} with wavelength {wavelengths[wavelength_index]}")
+                except Exception as e:
+                    print(f"Error creating band {num_band}: {str(e)}")
+                    raise
 
-        Author: Alexis Paris
-        """ 
-        current_wavelength = start_wavelength
-        bands = []
-        image = None
-        band_number = 1
+            start_wavelength = wavelengths[0]
+            end_wavelength = wavelengths[-1]
+            print(f"Start wavelength: {start_wavelength}, End wavelength: {end_wavelength}")
+            
+            image_ms = ImageManager.create_imagems_instance([image_path, start_wavelength, end_wavelength, image.size, bands])
+            print("Successfully created ImageMS instance")
+            return image_ms
+            
+        except Exception as e:
+            print(f"Error in Load method: {str(e)}")
+            print(f"Error type: {type(e)}")
+            import traceback
+            print("Full traceback:")
+            traceback.print_exc()
+            raise
 
-        for filename in os.listdir(path):
-            f = os.path.join(path, filename)
-            if os.path.isfile(f) and (f.lower().endswith('.tiff') or f.lower().endswith('.png') or f.lower().endswith('.jpg') or f.lower().endswith('.jpeg')):
-                with rasterio.open(f) as dataset:
-                    wavelength = current_wavelength + step
-                    if dataset.read(1).dtype == "uint16":
-                        image_data = (dataset.read(1)/256).astype("uint8")
-                    else:
-                        image_data = dataset.read(1)
-                    bands.append(ImageManager.create_band_instance([band_number, image_data, (current_wavelength, wavelength)]))
-                    current_wavelength = wavelength
-                    band_number += 1
-
-        height, width = dataset.shape
-
-        imageData = [path, start_wavelength, end_wavelength, (height, width), bands]
-        image = ImageManager.create_imagems_instance(imageData)
-        return image
+        

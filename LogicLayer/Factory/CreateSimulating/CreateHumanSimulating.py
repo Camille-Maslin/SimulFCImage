@@ -1,15 +1,7 @@
-from LogicLayer.Factory.CreateSimulating.ICreateSimulator import SimulatorFactory
+from LogicLayer.Factory.CreateSimulating import ICreateSimulator
 from LogicLayer.Factory.Simulating.HumanSimulating import HumanSimulating
+from LogicLayer import ImageMS
 
-class CreateHumanSimulator(SimulatorFactory):
-    def create_simulator(self, image_ms):
-        """
-        Create a simulator for human vision.
-
-        Args:
-            image_ms: An ImageMS object representing the multispectral image.
-
-        Returns:
-            An instance of HumanSimulating.
-        """
+class CreateHumanSimulator(ICreateSimulator):
+    def create_simulator(self, image_ms : ImageMS, bands_number : tuple = ()):
         return HumanSimulating(image_ms)

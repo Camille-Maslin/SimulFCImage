@@ -1,15 +1,8 @@
-from LogicLayer.Factory.CreateSimulating.ICreateSimulator import SimulatorFactory
-from LogicLayer.Factory.Simulating.BeeSimulating import BeeSimulating
+from LogicLayer.Factory.CreateSimulating import ICreateSimulator
+from LogicLayer.Factory.Simulating import BeeSimulating
+from LogicLayer import ImageMS
 
-class CreateBeeSimulator(SimulatorFactory):
-    def create_simulator(self, image_ms):
-        """
-        Create a simulator for bee vision.
+class CreateBeeSimulator(ICreateSimulator):
 
-        Args:
-            image_ms: An ImageMS object representing the multispectral image.
-
-        Returns:
-            An instance of BeeSimulating.
-        """
+    def create_simulator(self, image_ms : ImageMS, bands_number : tuple = ()):
         return BeeSimulating(image_ms)
