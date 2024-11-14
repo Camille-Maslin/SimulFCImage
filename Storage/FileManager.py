@@ -35,7 +35,7 @@ class FileManager :
     def Load(image_path: str, metadata_path: str) -> ImageMS:
         """
         Static method which allows loading an Image and its metadata from files selected by the user 
-        Args : 
+        args : 
             - image_path (str) : the absolute path of the image as a string
             - metadata_path (str) : the absolute path of the metadata .txt file
         @returns : an ImageMS class object
@@ -44,15 +44,15 @@ class FileManager :
         Author : Moreau Alexandre
         Author : Maslin Camille 
         """
-        metadata = FileManager.OpenAndGetMetaData(metadata_path, image_path)
-        image_ms = FileManager.OpenAndGetImageAndBandsData(image_path, metadata)
+        metadata = FileManager.open_and_get_metadata(metadata_path, image_path)
+        image_ms = FileManager.open_and_get_image_and_bands_data(image_path, metadata)
         return image_ms
 
     
-    def OpenAndGetMetaData(file_path : str, image_path : str) -> list :         
+    def open_and_get_metadata(file_path : str, image_path : str) -> list :         
         """
         Method which allow to open and get the metadata of the image 
-        Args : 
+        args : 
             - file_path (str) : path of the metadata .txt file to open and read
             - image_path (str) : absolute path of the image 
         @return : a list of float number 
@@ -70,7 +70,7 @@ class FileManager :
                 if ((image_name_found) and (FileManager.WAVELENGTH_LABEL in line)) :
                     wavelengths_found = True 
                     continue
-                if ((wavelengths_found) and (line.strip()) and (line.startswith(FileManager.TABULATION_SYMBOL))) : # Check if we have tabulation
+                if ((wavelengths_found) and (line.strip()) and (line.startswith(FileManager.TABULATION_SYMBOL))) : 
                     values = [float(val) for val in line.strip().split()]
                     wavelengths.extend(values)
             if (len(wavelengths) == 0): # If none of the data were found we raise an exception
@@ -78,10 +78,10 @@ class FileManager :
                 raise MetaDataNotFoundException(f"One of the metadata is missing in your {file_name}, please check if there is a missing label in your file")
         return wavelengths
 
-    def OpenAndGetImageAndBandsData(image_path : str, metadata : list) -> ImageMS :
+    def open_and_get_image_and_bands_data(image_path : str, metadata : list) -> ImageMS :
         """
         Method which allow to open and get an imported image data and her bands data too
-        Args : 
+        args : 
             - image_path (str) : path of the image to open and get the data
             - metadata (list) : list of metadata for the bands wavelength
         @return : an ImageMS object 
@@ -96,7 +96,7 @@ class FileManager :
             match image.mode : 
                 case FileManager.SHADE_OF_GREY : 
                     band_shade = np.array(image)*FileManager.MAX_COLOR_BITS
-                case FileManager._16BIT_IMAGE : 
+                case FileManager.IMAGE_16BIT : 
                     band_shade = np.array(image)/FileManager.NUMBER_TO_CONVERT_TO_8BITS
             # Use num_band - 1 to align with wavelengths array
             wavelength_index = num_band - 1

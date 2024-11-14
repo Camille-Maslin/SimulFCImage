@@ -175,9 +175,6 @@ class MainWindow(tk.Tk):
         self__quit_btn.grid(row=0, column=2, padx=10, pady=10, sticky="ne")  # Place the button at the top right
 
     def __display_default_image(self):
-        """
-        Loads and displays the default PNG image when the application starts or when no image is selected.
-        """
         png_path = "HMI/assets/no-image.1024x1024.png"
         image = Image.open(png_path)
         image = image.resize((400, 400))  # Resize to the specified size
@@ -186,15 +183,12 @@ class MainWindow(tk.Tk):
         self.__image_sim_label.config(image=self.__img)
 
     def __import_image(self):
-        """
-        Opens dialogs to import both the image and its wavelength metadata file.
-        """
         try:
             self.__folder_path = filedialog.askopenfilename(
                 title="Select the image file",
                 filetypes=[("Image Files", "*.tiff;*.tif")]
             )
-            
+
             if self.__folder_path:
                 # Ask for the metadata file
                 metadata_path = filedialog.askopenfilename(
@@ -228,9 +222,6 @@ class MainWindow(tk.Tk):
             messagebox.showerror("Error", f"An error occurred in import image.")
 
     def __update_image_label(self):
-        """
-        Updates the labels for the imported image
-        """
         self.title(f"SimulFCImage - {self.__image_ms.get_name()}")
         self.__image_name_label.config(text=f"Image name : {self.__image_ms.get_name()}")
         self.__band_number_label.config(text=f"Number of bands : {self.__image_ms.get_number_bands()}")
@@ -240,9 +231,6 @@ class MainWindow(tk.Tk):
         self.__band_total_number_label.config(text=f"/ {self.__image_ms.get_number_bands()}")
     
     def __enable_buttons(self):
-        """
-        Enable buttons
-        """
         self.__sim_btn.config(state='normal')
         self.__prev_btn.config(state='normal')
         self.__next_btn.config(state='normal')
@@ -251,59 +239,33 @@ class MainWindow(tk.Tk):
         self.__save_btn.config(state='normal')
     
     def __open_simulation_choice(self):
-        """
-        Opens the simulation choice window if an image has been imported.
-        """
         if self.__image_ms is not None:
             SimulationChoiceWindow(self, self.__image_ms)
         else:
             messagebox.showwarning("Warning", "Please import an image first.")
 
     def __next_band(self):
-        """
-        Advances to the next band and updates the displayed image and data.
-        """
         self.__image_ms.next_band()
         self.__update_image()
         self.__update_data()
 
     def __previous_band(self):
-        """
-        Goes back to the previous band and updates the displayed image and data.
-        """
         self.__image_ms.previous_band()
         self.__update_image()
         self.__update_data()
 
     def __update_data(self):
-        """
-        Updates the labels displaying the current band wavelength and number.
-        """
         self.__band_wavelength_label.config(text=f"{self.__image_ms.get_actualband().get_wavelength()[0]:.2f} nm")
         self.__band_current_number_text.delete(1.0, tk.END)
         self.__band_current_number_text.insert(tk.END, f"{self.__image_ms.get_actualband().get_number()}")
     
     def __update_image(self) : 
-        """
-        Update the image label due to the band change
-        """ 
         image = Image.fromarray(self.__image_ms.get_actualband().get_shade_of_grey())
         image = image.resize((400, 400))
-
         self.__band = ImageTk.PhotoImage(image=image)
         self.__image_label.config(image=self.__band, text="")
 
-    def __load_image(self, path, size=(400, 400)):  # Default size
-        """
-        Loads an image from the specified path and resizes it to the given dimensions.
-
-        Parameters:
-        - path: The file path of the image to load.
-        - size: A tuple specifying the desired width and height.
-
-        Returns:
-        - A PhotoImage object for displaying in a label.
-        """
+    def __load_image(self, path : str, size : tuple = (400, 400)) -> ImageTk.PhotoImage :  # Default size
         img = Image.open(path)
         img = img.resize(size)  # Resize to the specified size
         return ImageTk.PhotoImage(img)
@@ -319,10 +281,6 @@ class MainWindow(tk.Tk):
             self.__band_current_number_text.delete(1.0, tk.END)
 
     def __change_band(self, band_number: int):
-        """
-        Allow to change reel number with the input of the user
-        Author : Lakhdar Gibril
-        """
         try:
             if (band_number > self.__image_ms.get_number_bands()) or (band_number < 1):
                 raise NotExistingBandException("The band is nonexistant")
@@ -334,7 +292,4 @@ class MainWindow(tk.Tk):
             messagebox.askokcancel("Input Error", exception.__str__())
 
     def quit_application(self):
-        """
-        Closes the application.
-        """
         self.destroy()  # Close the application
