@@ -216,16 +216,16 @@ class MainWindow(tk.Tk):
                     except Exception as e:
                         print(f"Error during image loading: {str(e)}")
                         print(f"Error type: {type(e)}")
-                        messagebox.showerror("Error", f"An error occurred while loading the files: {str(e)}")
+                        messagebox.showerror("Error", f"An error occurred while loading the files.")
                 else:
-                    print("No metadata file selected")
                     messagebox.showwarning("Warning", "Metadata file is required. Import cancelled.")
             else:
-                print("No image file selected")
+                messagebox.showwarning("Warning", "Image file is required. Import cancelled.")
                 
         except Exception as e:
             print(f"Unexpected error in import_image: {str(e)}")
             print(f"Error type: {type(e)}")
+            messagebox.showerror("Error", f"An error occurred in import image.")
 
     def __update_image_label(self):
         """
