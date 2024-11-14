@@ -7,7 +7,7 @@ class MetaDataNotFoundException(Exception) :
     def __init__(self, message : str) : 
         """
         Natural constructor of MetaDataNotFoundException class
-        Args : 
+        args : 
             - message (str) : a string of the error message 
         Author : Lakhdar Gibril     
         """
