@@ -5,6 +5,7 @@ from PIL import Image, ImageTk
 import tkinter.messagebox as messagebox
 from Exceptions.NotExistingBandException import NotExistingBandException
 from Exceptions.EmptyRGBException import EmptyRGBException
+from LogicLayer.Factory.SimulatorFactory import SimulatorFactory
 
 class SimulationChoiceWindow(tk.Toplevel):
     """
@@ -152,32 +153,40 @@ class SimulationChoiceWindow(tk.Toplevel):
         tk.Label(self.__logo_frame, image=self.__right_logo, bg="white").pack(side="right", padx=20)
 
     def __proceed(self):
-        """
-        Method called when user clicks on Proceed button.
-        Verifies that all required values are filled before proceeding.
-        """
         try:
-            # Retrieve selected values
             simulation_type = self.__sim_choice.get()
+            factory = SimulatorFactory.instance()
+            
             if simulation_type == "rgb":
-                # Check that values are not empty
                 rgb_values = [spin.get().strip() for spin in self.__rgb_values]
                 if "" in rgb_values:
-                    raise EmptyRGBException("Please specify all RGB band values")
+                    raise EmptyRGBException("Please specify all RGB values")
                 
-                # Convert to integers
                 r, g, b = map(int, rgb_values)
-                print(f"RGB bands selected: R={r}, G={g}, B={b}")
-                self.destroy()
+                bands = (
+                    self.__image_ms.get_bands()[r-1],
+                    self.__image_ms.get_bands()[g-1],
+                    self.__image_ms.get_bands()[b-1]
+                )
+                
+                simulator = factory.create("band_choice", self.__image_ms, bands)
             else:
-                # For other simulation types
-                print(f"Simulation type selected: {simulation_type}")
-                self.destroy()
+                simulator = factory.create(simulation_type, self.__image_ms)
+            
+            # Execute the simulation
+            simulated_image = simulator.simulate()
+            
+            # Display the simulated image in the main window
+            self.master.display_simulated_image(simulated_image)
+            
+            self.destroy()
                 
         except EmptyRGBException as exception:
-            messagebox.showwarning("Warning", exception.__str__())
+            messagebox.showwarning("Attention", str(exception))
         except ValueError:
-            messagebox.showwarning("Warning", "Invalid RGB values. Please enter valid numbers.")
+            messagebox.showwarning("Attention", "Invalid RGB values. Please enter valid numbers.")
+        except IndexError:
+            messagebox.showwarning("Attention", "Invalid band number. Please check the entered values.")
 
     def __next_band(self):
         """Changes to next band in the image sequence"""

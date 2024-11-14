@@ -5,6 +5,12 @@ from Storage.FileManager import FileManager
 from HMI.SimulationChoiceWindow import SimulationChoiceWindow
 from Exceptions.NotExistingBandException import NotExistingBandException
 import os
+from LogicLayer.Factory.SimulatorFactory import SimulatorFactory
+from LogicLayer.Factory.CreateSimulating.CreateBandChoiceSimulating import CreateBandChoiceSimulator
+from LogicLayer.Factory.CreateSimulating.CreateHumanSimulating import CreateHumanSimulator
+from LogicLayer.Factory.CreateSimulating.CreateBeeSimulating import CreateBeeSimulator
+from LogicLayer.Factory.CreateSimulating.CreateDaltonianSimulating import CreateDaltonianSimulator
+import numpy as np
 
 class MainWindow(tk.Tk):
     """
@@ -20,6 +26,13 @@ class MainWindow(tk.Tk):
         """
         # Calling the parent constructor of the Tk class.
         super().__init__()
+
+        # Initialization of the factory
+        factory = SimulatorFactory.instance()
+        factory.register("band_choice", CreateBandChoiceSimulator())
+        factory.register("human", CreateHumanSimulator())
+        factory.register("bee", CreateBeeSimulator())
+        factory.register("daltonien", CreateDaltonianSimulator())
 
         # Set up the main window properties
         self.title("SimulFCImage - Main Window")
@@ -45,6 +58,9 @@ class MainWindow(tk.Tk):
         self.__initialize_widgets()
         # Display a default PNG image at startup
         self.__display_default_image()
+
+        # Attribute to store the simulated image
+        self._simulated_image = None
 
     def __initialize_widgets(self):
         """
@@ -153,7 +169,7 @@ class MainWindow(tk.Tk):
         self.__image_sim_label.pack(padx=10, pady=(10, 0))  # Add padding above the generated image
 
         # Save Button
-        self.__save_btn = ttk.Button(self.__simulated_image_frame, text="Save", state='disabled')
+        self.__save_btn = ttk.Button(self.__simulated_image_frame, text="Save", command=self.__save_simulated_image, state='disabled')
         self.__save_btn.pack(pady=20)  # Place the button under the simulated image
 
         # Placeholder for logos
@@ -293,3 +309,46 @@ class MainWindow(tk.Tk):
 
     def quit_application(self):
         self.destroy()  # Close the application
+
+    def display_simulated_image(self, simulated_image):
+        """
+        Displays the simulated image in the main window.
+        
+        Args:
+            simulated_image (np.ndarray): Simulated image to display
+        """
+        # Convert numpy array to PIL image
+        image = Image.fromarray((simulated_image * 255).astype(np.uint8))
+        image = image.resize((400, 400))  # Same size as original image
+        
+        # Create and update the simulated image in the existing label
+        self._simulated_img = ImageTk.PhotoImage(image=image)
+        self.__image_sim_label.config(image=self._simulated_img)
+        
+        # Store the simulated image and activate the Save button
+        self._simulated_image = simulated_image
+        self.__save_btn.config(state='normal')
+
+    def __save_simulated_image(self):
+        """
+        Opens a dialog box to save the simulated image
+        """
+        if self._simulated_image is None:
+            return
+        
+        file_types = [
+            ('PNG files', '*.png'),
+            ('JPEG files', '*.jpg'),
+            ('All files', '*.*')
+        ]
+        
+        file_path = filedialog.asksaveasfilename(
+            defaultextension='.png',
+            filetypes=file_types,
+            title='Save Simulated Image'
+        )
+        
+        if file_path:
+            # Convert numpy array to PIL image
+            image = Image.fromarray((self._simulated_image * 255).astype(np.uint8))
+            image.save(file_path)
