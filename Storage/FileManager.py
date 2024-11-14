@@ -86,11 +86,12 @@ class FileManager :
                 try:
                     image.seek(num_band)  # Get the band data
                     band_shade = np.array(image)
-                    if(image.mode == FileManager.SHADE_OF_GREY):
-                        band_shade = np.array(image)*FileManager.MAX_COLOR_BITS
-                    elif(image.mode == FileManager._16BIT_IMAGE):
-                        band_shade = np.array(image)/FileManager.NUMBER_TO_CONVERT_TO_8BITS
-                    
+                    match image.mode : 
+                        case FileManager.SHADE_OF_GREY : 
+                            band_shade = np.array(image)*FileManager.MAX_COLOR_BITS
+                        case FileManager._16BIT_IMAGE : 
+                            band_shade = np.array(image)/FileManager.NUMBER_TO_CONVERT_TO_8BITS
+ 
                     # Use num_band - 1 to align with wavelengths array
                     wavelength_index = num_band - 1
                     band = ImageManager.create_band_instance([
