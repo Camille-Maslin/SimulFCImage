@@ -32,6 +32,14 @@ class FileManager :
     def Load(image_path: str, metadata_path: str) -> ImageMS:
         """
         Static method which allows loading an Image and its metadata from files selected by the user 
+        Args : 
+            - image_path (str) : the absolute path of the image as a string
+            - metadata_path (str) : the absolute path of the metadata .txt file
+        @returns : an ImageMS class object
+        Author : Lakhdar Gibril
+        Author : Paris Alexis (first version of the method)
+        Author : Moreau Alexandre
+        Author : Maslin Camille 
         """
         try:
             # Load the image
