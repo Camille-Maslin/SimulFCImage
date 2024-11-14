@@ -216,8 +216,6 @@ class MainWindow(tk.Tk):
                     except Exception as e:
                         print(f"Error during image loading: {str(e)}")
                         print(f"Error type: {type(e)}")
-                        import traceback
-                        traceback.print_exc()
                         messagebox.showerror("Error", f"An error occurred while loading the files: {str(e)}")
                 else:
                     print("No metadata file selected")
