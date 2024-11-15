@@ -25,14 +25,14 @@ class BandChoiceSimulating(SimulateMethod):
         Author :  Lakhdar Gibril, Camille Maslin
         """
         # Retrieving the data of each band
-        red_data = self.__bands[0].get_shade_of_grey()
-        green_data = self.__bands[1].get_shade_of_grey()
-        blue_data = self.__bands[2].get_shade_of_grey()
+        red_band_data = self.__bands[0].get_shade_of_grey()
+        green_band_data = self.__bands[1].get_shade_of_grey()
+        blue_band_data = self.__bands[2].get_shade_of_grey()
         
         # Normalization of the data for each channel (0-1)
-        red_normalized = (red_data - np.min(red_data)) / (np.max(red_data) - np.min(red_data))
-        green_normalized = (green_data - np.min(green_data)) / (np.max(green_data) - np.min(green_data))
-        blue_normalized = (blue_data - np.min(blue_data)) / (np.max(blue_data) - np.min(blue_data))
+        red_normalized = (red_band_data - np.min(red_band_data)) / (np.max(red_band_data) - np.min(red_band_data))
+        green_normalized = (green_band_data - np.min(green_band_data)) / (np.max(green_band_data) - np.min(green_band_data))
+        blue_normalized = (blue_band_data - np.min(blue_band_data)) / (np.max(blue_band_data) - np.min(blue_band_data))
         
         # Creating the RGB image by stacking the three channels
         rgb_image = np.dstack((red_normalized, green_normalized, blue_normalized))
