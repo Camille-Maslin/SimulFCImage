@@ -1,6 +1,6 @@
 from typing import Dict, List
-from LogicLayer.Factory.CreateSimulating.ICreateSimulator import SimulatorFactory as ICreateSimulator
-from LogicLayer.Factory.Simulating.SimulatingMethod import SimulatingMethod
+from LogicLayer.Factory.CreateSimulating.ICreateSimulator import ICreateSimulator
+from LogicLayer.Factory.Simulating.SimulatingMethod import SimulateMethod as SimulatingMethod
 
 class SimulatorFactory:
     """
@@ -28,9 +28,9 @@ class SimulatorFactory:
         Returns:
             SimulatorFactory: The unique instance of the class.
         """
-        if SimulatorFactory._instance is None:
-            SimulatorFactory._instance = SimulatorFactory()
-        return SimulatorFactory._instance
+        if SimulatorFactory.__instance is None:
+            SimulatorFactory.__instance = SimulatorFactory()
+        return SimulatorFactory.__instance
 
     @property
     def simulators(self) -> List[str]:
@@ -40,15 +40,16 @@ class SimulatorFactory:
         Returns:
             List[str]: List of simulator names.
         """
-        return list(self._builders.keys())
+        return list(self.__builders.keys())
 
-    def create(self, name: str, image_ms) -> SimulatingMethod:
+    def create(self, name: str, image_ms, bands_number: tuple = ()) -> SimulatingMethod:
         """
         Creates a simulator using the registered constructor for the given name.
 
         Args:
             name (str): The name of the simulator to create.
             image_ms: An ImageMS object representing the multispectral image.
+            bands_number (tuple): Optional tuple of band numbers for RGB simulation.
 
         Returns:
             SimulatingMethod: An instance of the created simulator.
@@ -56,10 +57,10 @@ class SimulatorFactory:
         Raises:
             ValueError: If the simulator is not registered.
         """
-        builder = self._builders.get(name)
+        builder = self.__builders.get(name)
         if not builder:
             raise ValueError(f"Simulator '{name}' not registered.")
-        return builder.create_simulator(image_ms)
+        return builder.create_simulator(image_ms, bands_number)
 
     def register(self, name: str, builder: ICreateSimulator) -> None:
         """
@@ -69,4 +70,4 @@ class SimulatorFactory:
             name (str): The name of the simulator.
             builder (ICreateSimulator): The simulator's constructor.
         """
-        self._builders[name] = builder
+        self.__builders[name] = builder
