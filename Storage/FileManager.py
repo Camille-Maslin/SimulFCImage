@@ -23,13 +23,17 @@ class FileManager :
         pass 
     
     @staticmethod
-    def Save(image : ImageMS) -> None : 
+    def convert_to_image_and_save(image : np.ndarray, path : str) -> None : 
         """
         Static method which allow to save an image 
-        Parameters : 
-            - the image created by the simulation, which is an instance of the ImageMS class 
+        args : 
+            - image (np.ndarray) : the simulated image to save as an np.ndarray
+            - path (str) : the path to save the image
+        Author : Lakhdar Gibril
         """
-        pass
+        image_to_save = Image.fromarray((image * FileManager.MAX_COLOR_BITS).astype(np.uint8)) # To convert the ndarray into a PIL image
+        image_to_save.save(path)
+
 
     @staticmethod
     def Load(image_path: str, metadata_path: str) -> ImageMS:
@@ -89,7 +93,6 @@ class FileManager :
         """ 
         image = Image.open(image_path)
         bands = []
-        print(image.n_frames)
         for num_band in range (1, image.n_frames) :
             image.seek(num_band)
             band_shade = np.array(image)

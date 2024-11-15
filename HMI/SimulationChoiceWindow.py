@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from LogicLayer import ImageMS 
+from LogicLayer.ImageMS import ImageMS 
 from PIL import Image, ImageTk
 import tkinter.messagebox as messagebox
 from Exceptions.NotExistingBandException import NotExistingBandException

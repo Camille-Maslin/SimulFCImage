@@ -48,7 +48,6 @@ class MainWindow(tk.Tk):
         self.__style.configure('TLabel', font=('Arial', 14))  # Label style
 
         # Initialize instance variables
-        self.__image_path = None  # Path to the imported image
         self.__image_label = None  # Label to display the image
 
         # Initialize to None the ImageMS class object
@@ -233,8 +232,6 @@ class MainWindow(tk.Tk):
                 messagebox.showwarning("Warning", "Image file is required. Import cancelled.")
                 
         except Exception as e:
-            print(f"Unexpected error in import_image: {str(e)}")
-            print(f"Error type: {type(e)}")
             messagebox.showerror("Error", f"An error occurred in import image.")
 
     def __update_image_label(self):
@@ -310,11 +307,10 @@ class MainWindow(tk.Tk):
     def quit_application(self):
         self.destroy()  # Close the application
 
-    def display_simulated_image(self, simulated_image):
+    def display_simulated_image(self, simulated_image : np.ndarray):
         """
         Displays the simulated image in the main window.
-        
-        Args:
+        args:
             simulated_image (np.ndarray): Simulated image to display
         """
         # Convert numpy array to PIL image
@@ -333,22 +329,14 @@ class MainWindow(tk.Tk):
         """
         Opens a dialog box to save the simulated image
         """
-        if self._simulated_image is None:
-            return
-        
-        file_types = [
-            ('PNG files', '*.png'),
-            ('JPEG files', '*.jpg'),
-            ('All files', '*.*')
-        ]
-        
-        file_path = filedialog.asksaveasfilename(
+        file_path = filedialog.asksaveasfilename (
             defaultextension='.png',
-            filetypes=file_types,
+            filetypes=[
+                ('PNG files','*.png'),
+                ('JPEG files','*.jpg'),
+                ('TIF files','*.jpg'),
+                ('All files','*')
+            ],
             title='Save Simulated Image'
         )
-        
-        if file_path:
-            # Convert numpy array to PIL image
-            image = Image.fromarray((self._simulated_image * 255).astype(np.uint8))
-            image.save(file_path)
+        FileManager.convert_to_image_and_save(self._simulated_image, file_path) 

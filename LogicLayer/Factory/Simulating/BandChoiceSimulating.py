@@ -20,8 +20,7 @@ class BandChoiceSimulating(SimulateMethod):
         Merges three selected bands into an RGB image.
         Each band is assigned to a specific color channel (R, G or B).
         
-        Returns:
-            np.ndarray: Normalized RGB image
+        @returns: np.ndarray: Normalized RGB image
 
         Author :  Lakhdar Gibril, Camille Maslin
         """
