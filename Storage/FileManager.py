@@ -23,25 +23,16 @@ class FileManager :
         pass 
     
     @staticmethod
-    def Save(image : ImageMS) -> None : 
+    def convert_to_image_and_save(image : np.ndarray, path : str) -> None : 
         """
         Static method which allow to save an image 
-        Parameters : 
-            - the image created by the simulation, which is an instance of the ImageMS class 
+        args : 
+            - image (np.ndarray) : the simulated image to save as an np.ndarray
+            - path (str) : the path to save the image
+        Author : Lakhdar Gibril
         """
-        from tkinter import filedialog
-        import PIL.Image
-        
-        # Ask user where to save the file
-        save_path = filedialog.asksaveasfilename(
-            defaultextension=".png",
-            filetypes=[("PNG files", "*.png"), ("All files", "*.*")]
-        )
-        
-        if save_path:
-            # Convert numpy array to PIL Image and save
-            img = PIL.Image.fromarray(image)
-            img.save(save_path)
+        image_to_save = Image.fromarray((image * FileManager.MAX_COLOR_BITS).astype(np.uint8)) # To convert the ndarray into a PIL image
+        image_to_save.save(path)
 
     @staticmethod
     def Load(image_path: str, metadata_path: str) -> ImageMS:
@@ -124,21 +115,3 @@ class FileManager :
                 bands.append(band)
             image_ms = ImageManager.create_imagems_instance([image_path, metadata[0], metadata[-1], image.size, bands])
             return image_ms
-
-    @staticmethod
-    def LoadMetadata(metadata_path: str) -> list:
-        """
-        Load only the metadata from a file
-        
-        Args:
-            metadata_path: Path to the metadata file
-            
-        Returns:
-            List of tuples (min_wavelength, max_wavelength)
-        """
-        wavelengths = []
-        with open(metadata_path, 'r') as f:
-            for line in f:
-                min_wave, max_wave = map(float, line.strip().split())
-                wavelengths.append((min_wave, max_wave))
-        return wavelengths
