@@ -1,6 +1,6 @@
-from LogicLayer.Factory.Simulating import SimulatingMethod
+from LogicLayer.Factory.Simulating.SimulatingMethod import SimulateMethod
 
-class HumanSimulating(SimulatingMethod):
+class HumanSimulating(SimulateMethod):
     def __init__(self, image_ms):
         super().__init__(image_ms)
 

@@ -1,4 +1,4 @@
-from LogicLayer.Factory.CreateSimulating import ICreateSimulator
+from LogicLayer.Factory.CreateSimulating.ICreateSimulator import ICreateSimulator
 from LogicLayer.Factory.Simulating.HumanSimulating import HumanSimulating
 from LogicLayer import ImageMS
 

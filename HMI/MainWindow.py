@@ -4,6 +4,13 @@ from PIL import Image, ImageTk
 from Storage.FileManager import FileManager
 from HMI.SimulationChoiceWindow import SimulationChoiceWindow
 from Exceptions.NotExistingBandException import NotExistingBandException
+import os
+from LogicLayer.Factory.SimulatorFactory import SimulatorFactory
+from LogicLayer.Factory.CreateSimulating.CreateBandChoiceSimulating import CreateBandChoiceSimulator
+from LogicLayer.Factory.CreateSimulating.CreateHumanSimulating import CreateHumanSimulator
+from LogicLayer.Factory.CreateSimulating.CreateBeeSimulating import CreateBeeSimulator
+from LogicLayer.Factory.CreateSimulating.CreateDaltonianSimulating import CreateDaltonianSimulator
+import numpy as np
 
 class MainWindow(tk.Tk):
     """
@@ -19,6 +26,13 @@ class MainWindow(tk.Tk):
         """
         # Calling the parent constructor of the Tk class.
         super().__init__()
+
+        # Initialization of the factory
+        factory = SimulatorFactory.instance()
+        factory.register("band_choice", CreateBandChoiceSimulator())
+        factory.register("human", CreateHumanSimulator())
+        factory.register("bee", CreateBeeSimulator())
+        factory.register("daltonien", CreateDaltonianSimulator())
 
         # Set up the main window properties
         self.title("SimulFCImage - Main Window")
@@ -44,6 +58,9 @@ class MainWindow(tk.Tk):
         self.__initialize_widgets()
         # Display a default PNG image at startup
         self.__display_default_image()
+
+        # Attribute to store the simulated image
+        self._simulated_image = None
 
     def __initialize_widgets(self):
         """
@@ -152,7 +169,7 @@ class MainWindow(tk.Tk):
         self.__image_sim_label.pack(padx=10, pady=(10, 0))  # Add padding above the generated image
 
         # Save Button
-        self.__save_btn = ttk.Button(self.__simulated_image_frame, text="Save", state='disabled')
+        self.__save_btn = ttk.Button(self.__simulated_image_frame, text="Save", command=self.__save_simulated_image, state='disabled')
         self.__save_btn.pack(pady=20)  # Place the button under the simulated image
 
         # Placeholder for logos
@@ -174,9 +191,6 @@ class MainWindow(tk.Tk):
         self__quit_btn.grid(row=0, column=2, padx=10, pady=10, sticky="ne")  # Place the button at the top right
 
     def __display_default_image(self):
-        """
-        Loads and displays the default PNG image when the application starts or when no image is selected.
-        """
         png_path = "HMI/assets/no-image.1024x1024.png"
         image = Image.open(png_path)
         image = image.resize((400, 400))  # Resize to the specified size
@@ -185,139 +199,89 @@ class MainWindow(tk.Tk):
         self.__image_sim_label.config(image=self.__img)
 
     def __import_image(self):
-        """
-        Opens a dialog to import an image and prompts the user to enter wavelength parameters.
-        """
-        self.__folder_path = filedialog.askdirectory()
-        if self.__folder_path:
-            try:
-                # Create a custom dialog window
-                dialog = tk.Toplevel(self)
-                dialog.title("Enter the wavelengths")
-
-                tk.Label(dialog, text="Start wavelength:").grid(row=0, column=0, padx=10, pady=5)
-                start_entry = tk.Entry(dialog)
-                start_entry.grid(row=0, column=1, padx=10, pady=5)
-
-                tk.Label(dialog, text="End wavelength:").grid(row=1, column=0, padx=10, pady=5)
-                end_entry = tk.Entry(dialog)
-                end_entry.grid(row=1, column=1, padx=10, pady=5)
-
-                tk.Label(dialog, text="Wavelength step:").grid(row=2, column=0, padx=10, pady=5)
-                step_entry = tk.Entry(dialog)
-                step_entry.grid(row=2, column=1, padx=10, pady=5)
-
-                submit_btn = ttk.Button(dialog, text="Submit", command=lambda: self.__on_submit(dialog, start_entry, end_entry, step_entry))
-                submit_btn.grid(row=3, columnspan=2, pady=10)
-
-                dialog.transient(self)
-                dialog.grab_set()
-                self.wait_window(dialog)
-
-                self.__image_path = self.__folder_path  # Update the path of the imported image
-
-            except Exception :
-                messagebox.askokcancel("Loading Error","Error loading image")
-
-    def __on_submit(self, dialog: tk.Toplevel, start_entry: tk.Entry, end_entry: tk.Entry, step_entry: tk.Entry):
-        """
-        Processes the wavelength parameters entered by the user and updates the image display accordingly.
-
-        Parameters:
-        - dialog: The dialog window for entering wavelengths.
-        - start_entry: Entry widget for the start wavelength.
-        - end_entry: Entry widget for the end wavelength.
-        - step_entry: Entry widget for the wavelength step.
-        """
         try:
-            start_wavelength = int(start_entry.get())
-            end_wavelength = int(end_entry.get())
-            wavelength_step = int(step_entry.get())
-            dialog.destroy()
+            self.__folder_path = filedialog.askopenfilename(
+                title="Select the image file",
+                filetypes=[("Image Files", "*.tiff;*.tif")]
+            )
 
-            # Continue with the image processing
-            self.__image_ms = FileManager.Load(self.__folder_path, start_wavelength, end_wavelength, wavelength_step)
+            if self.__folder_path:
+                # Ask for the metadata file
+                metadata_path = filedialog.askopenfilename(
+                    title="Select the wavelength metadata file",
+                    filetypes=[("Text Files", "*.txt")],
+                    initialdir=os.path.dirname(self.__folder_path)
+                )
+                
+                if metadata_path:
+                    try:
+                        self.__image_ms = FileManager.Load(self.__folder_path, metadata_path)
+                        self.__update_image()
+                        
+                        # Update window title, buttons and labels
+                        self.__update_image_label()
+                        self.__enable_buttons()    
+                        self.__update_data()
+                        
+                    except Exception as e:
+                        print(f"Error during image loading: {str(e)}")
+                        print(f"Error type: {type(e)}")
+                        messagebox.showerror("Error", f"An error occurred while loading the files.")
+                else:
+                    messagebox.showwarning("Warning", "Metadata file is required. Import cancelled.")
+            else:
+                messagebox.showwarning("Warning", "Image file is required. Import cancelled.")
+                
+        except Exception as e:
+            print(f"Unexpected error in import_image: {str(e)}")
+            print(f"Error type: {type(e)}")
+            messagebox.showerror("Error", f"An error occurred in import image.")
 
-            self.__update_image()
-
-            # Update the label to show the name of the imported image
-            self.title(f"SimulFCImage - {self.__image_ms.get_name()}")
-
-            # Update the existing labels to show the image data
-            self.__image_name_label.config(text=f"Image name : {self.__image_ms.get_name()}")  # Update the existing label
-            self.__band_number_label.config(text=f"Number of bands : {self.__image_ms.get_number_bands()}")
-            self.__start_wavelength_label.config(text=f"Start wavelength : {self.__image_ms.get_start_wavelength()}")
-            self.__end_wavelength_label.config(text=f"End wavelength : {self.__image_ms.get_end_wavelength()}")
-            self.__image_size_label.config(text=f"Image size : {self.__image_ms.get_size()[0]} x {self.__image_ms.get_size()[1]}")
-            self.__band_total_number_label.config(text=f"/ {self.__image_ms.get_number_bands()}")
-            
-            # Enable the simulation buttons
-            self.__sim_btn.config(state='normal')  # Enable the button after image import
-            self.__prev_btn.config(state='normal')  # Enable the button after image import
-            self.__next_btn.config(state='normal')  # Enable the button after image import
-
-            self.__band_current_number_text.config(state='normal')
-            self.__band_current_number_text.bind('<Return>', self.__on_return_pressed)
-            
-            self.__update_data()
-
-            # Enable the Save button after image generation
-            self.__save_btn.config(state='normal')  
-        except ValueError:
-            tk.Label(dialog, text="Please enter valid values.", fg="red").grid(row=4, columnspan=2)
-
+    def __update_image_label(self):
+        self.title(f"SimulFCImage - {self.__image_ms.get_name()}")
+        self.__image_name_label.config(text=f"Image name : {self.__image_ms.get_name()}")
+        self.__band_number_label.config(text=f"Number of bands : {self.__image_ms.get_number_bands()}")
+        self.__start_wavelength_label.config(text=f"Start wavelength : {self.__image_ms.get_start_wavelength():.2f} nm")
+        self.__end_wavelength_label.config(text=f"End wavelength : {self.__image_ms.get_end_wavelength():.2f} nm")
+        self.__image_size_label.config(text=f"Image size : {self.__image_ms.get_size()[0]} x {self.__image_ms.get_size()[1]}")
+        self.__band_total_number_label.config(text=f"/ {self.__image_ms.get_number_bands()}")
+    
+    def __enable_buttons(self):
+        self.__sim_btn.config(state='normal')
+        self.__prev_btn.config(state='normal')
+        self.__next_btn.config(state='normal')
+        self.__band_current_number_text.config(state='normal')
+        self.__band_current_number_text.bind('<Return>', self.__on_return_pressed)
+        self.__save_btn.config(state='normal')
+    
     def __open_simulation_choice(self):
-        """
-        Opens the simulation choice window if an image has been imported.
-        """
-        if self.__image_path is not None:  # Ensure there is an image path before opening the window
-            SimulationChoiceWindow(self, self.__image_path)  # Pass image_path to SimulationChoiceWindow
-            
+        if self.__image_ms is not None:
+            SimulationChoiceWindow(self, self.__image_ms)
+        else:
+            messagebox.showwarning("Warning", "Please import an image first.")
+
     def __next_band(self):
-        """
-        Advances to the next band and updates the displayed image and data.
-        """
         self.__image_ms.next_band()
         self.__update_image()
         self.__update_data()
 
     def __previous_band(self):
-        """
-        Goes back to the previous band and updates the displayed image and data.
-        """
         self.__image_ms.previous_band()
         self.__update_image()
         self.__update_data()
 
     def __update_data(self):
-        """
-        Updates the labels displaying the current band wavelength and number.
-        """
-        self.__band_wavelength_label.config(text=f"{self.__image_ms.get_actualband().get_wavelength()[0]} nm - {self.__image_ms.get_actualband().get_wavelength()[1]} nm")
+        self.__band_wavelength_label.config(text=f"{self.__image_ms.get_actualband().get_wavelength()[0]:.2f} nm")
         self.__band_current_number_text.delete(1.0, tk.END)
         self.__band_current_number_text.insert(tk.END, f"{self.__image_ms.get_actualband().get_number()}")
     
     def __update_image(self) : 
-        """
-        Update the image label due to the band change
-        """ 
         image = Image.fromarray(self.__image_ms.get_actualband().get_shade_of_grey())
         image = image.resize((400, 400))
+        self.__band = ImageTk.PhotoImage(image=image)
+        self.__image_label.config(image=self.__band, text="")
 
-        self.__img = ImageTk.PhotoImage(image=image)
-        self.__image_label.config(image=self.__img, text="")
-
-    def __load_image(self, path, size=(400, 400)):  # Default size
-        """
-        Loads an image from the specified path and resizes it to the given dimensions.
-
-        Parameters:
-        - path: The file path of the image to load.
-        - size: A tuple specifying the desired width and height.
-
-        Returns:
-        - A PhotoImage object for displaying in a label.
-        """
+    def __load_image(self, path : str, size : tuple = (400, 400)) -> ImageTk.PhotoImage :  # Default size
         img = Image.open(path)
         img = img.resize(size)  # Resize to the specified size
         return ImageTk.PhotoImage(img)
@@ -333,10 +297,6 @@ class MainWindow(tk.Tk):
             self.__band_current_number_text.delete(1.0, tk.END)
 
     def __change_band(self, band_number: int):
-        """
-        Allow to change reel number with the input of the user
-        Author : Lakhdar Gibril
-        """
         try:
             if (band_number > self.__image_ms.get_number_bands()) or (band_number < 1):
                 raise NotExistingBandException("The band is nonexistant")
@@ -348,7 +308,47 @@ class MainWindow(tk.Tk):
             messagebox.askokcancel("Input Error", exception.__str__())
 
     def quit_application(self):
-        """
-        Closes the application.
-        """
         self.destroy()  # Close the application
+
+    def display_simulated_image(self, simulated_image):
+        """
+        Displays the simulated image in the main window.
+        
+        Args:
+            simulated_image (np.ndarray): Simulated image to display
+        """
+        # Convert numpy array to PIL image
+        image = Image.fromarray((simulated_image * 255).astype(np.uint8))
+        image = image.resize((400, 400))  # Same size as original image
+        
+        # Create and update the simulated image in the existing label
+        self._simulated_img = ImageTk.PhotoImage(image=image)
+        self.__image_sim_label.config(image=self._simulated_img)
+        
+        # Store the simulated image and activate the Save button
+        self._simulated_image = simulated_image
+        self.__save_btn.config(state='normal')
+
+    def __save_simulated_image(self):
+        """
+        Opens a dialog box to save the simulated image
+        """
+        if self._simulated_image is None:
+            return
+        
+        file_types = [
+            ('PNG files', '*.png'),
+            ('JPEG files', '*.jpg'),
+            ('All files', '*.*')
+        ]
+        
+        file_path = filedialog.asksaveasfilename(
+            defaultextension='.png',
+            filetypes=file_types,
+            title='Save Simulated Image'
+        )
+        
+        if file_path:
+            # Convert numpy array to PIL image
+            image = Image.fromarray((self._simulated_image * 255).astype(np.uint8))
+            image.save(file_path)

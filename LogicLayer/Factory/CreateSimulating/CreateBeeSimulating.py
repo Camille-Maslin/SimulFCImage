@@ -1,5 +1,5 @@
-from LogicLayer.Factory.CreateSimulating import ICreateSimulator
-from LogicLayer.Factory.Simulating import BeeSimulating
+from LogicLayer.Factory.CreateSimulating.ICreateSimulator import ICreateSimulator
+from LogicLayer.Factory.Simulating.BeeSimulating import BeeSimulating
 from LogicLayer import ImageMS
 
 class CreateBeeSimulator(ICreateSimulator):

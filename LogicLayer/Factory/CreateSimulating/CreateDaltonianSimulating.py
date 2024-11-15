@@ -1,5 +1,5 @@
-from LogicLayer.Factory.CreateSimulating import ICreateSimulator
-from LogicLayer.Factory.Simulating import DaltonianSimulating
+from LogicLayer.Factory.CreateSimulating.ICreateSimulator import ICreateSimulator
+from LogicLayer.Factory.Simulating.DaltonianSimulating import DaltonianSimulating
 from LogicLayer import ImageMS
 
 class CreateDaltonianSimulator(ICreateSimulator):

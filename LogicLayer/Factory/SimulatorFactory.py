@@ -1,6 +1,6 @@
 from typing import Dict, List
 from LogicLayer.Factory.CreateSimulating.ICreateSimulator import ICreateSimulator
-from LogicLayer.Factory.Simulating import SimulatingMethod
+from LogicLayer.Factory.Simulating.SimulatingMethod import SimulateMethod as SimulatingMethod
 
 class SimulatorFactory:
     """
@@ -42,13 +42,14 @@ class SimulatorFactory:
         """
         return list(self.__builders.keys())
 
-    def create(self, name: str, image_ms) -> SimulatingMethod:
+    def create(self, name: str, image_ms, bands_number: tuple = ()) -> SimulatingMethod:
         """
         Creates a simulator using the registered constructor for the given name.
 
         Args:
             name (str): The name of the simulator to create.
             image_ms: An ImageMS object representing the multispectral image.
+            bands_number (tuple): Optional tuple of band numbers for RGB simulation.
 
         Returns:
             SimulatingMethod: An instance of the created simulator.
@@ -59,7 +60,7 @@ class SimulatorFactory:
         builder = self.__builders.get(name)
         if not builder:
             raise ValueError(f"Simulator '{name}' not registered.")
-        return builder.create_simulator(image_ms)
+        return builder.create_simulator(image_ms, bands_number)
 
     def register(self, name: str, builder: ICreateSimulator) -> None:
         """
