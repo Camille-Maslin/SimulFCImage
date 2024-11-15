@@ -36,7 +36,7 @@ class MainWindow(tk.Tk):
 
         # Set up the main window properties
         self.title("SimulFCImage - Main Window")
-        self.attributes('-fullscreen', True)  # Enable fullscreen mode
+        self.state("zoomed") # Maximize the window
         self.configure(bg='white')  # Set background color
         self.columnconfigure(0, weight=1)  # Configure column weight for responsiveness
         self.rowconfigure(0, weight=1)  # Configure row weight for responsiveness
@@ -184,11 +184,7 @@ class MainWindow(tk.Tk):
         self.__right_logo_image = self.__load_image("HMI/assets/Logo-laboratoire-ImViA.png", size=(300, 160))  # Store the image with size 300x160
         self.__right_logo = tk.Label(self.__logo_frame, image=self.__right_logo_image, bg="white")
         self.__right_logo.pack(side=tk.RIGHT, padx=(10, 100))
-
-        # Quit button at the top right
-        self__quit_btn = ttk.Button(self.__main_frame, text="Quit", command=self.quit_application)
-        self__quit_btn.grid(row=0, column=2, padx=10, pady=10, sticky="ne")  # Place the button at the top right
-
+        
     def __display_default_image(self):
         png_path = "HMI/assets/no-image.1024x1024.png"
         image = Image.open(png_path)

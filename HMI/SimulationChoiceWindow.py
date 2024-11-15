@@ -27,7 +27,7 @@ class SimulationChoiceWindow(tk.Toplevel):
         Author: Camille Maslin
         """
         super().__init__(parent)
-        self.__image_ms = image_ms  # Store the image_path
+        self.__image_ms = image_ms  # Store the imagems
         self.title("Choose a simulation method")
         self.geometry("1000x800")
         self.configure(bg='white')
