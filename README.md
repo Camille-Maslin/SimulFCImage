@@ -1,5 +1,7 @@
 <h1> SimulFCImage - LaBabaTcheam C1 </h1>
 
+
+
 <h2>Project Goal</h2>
 <p>SimulFCImage is a Python-based application designed for the manipulation of multispectral images,
 allowing users to perceive them in color. With its intuitive user interface, it enables the selection of various simulation methods to generate these images.
@@ -29,6 +31,8 @@ Example of use: Isolating the visualization of a specific wavelength to highligh
 
 <h2>How to use the application?</h2> 
 
+<img src="HMI/assets/MainWindow.png" width="1024"/>
+
 <h3>Situation 1: You want the application compiled as an .exe file</h3>
 
 <h4>Setup:</h4>
@@ -44,6 +48,10 @@ Example of use: Isolating the visualization of a specific wavelength to highligh
 
 <h3>Generate a color image:</h3>
 
+<h4>Generate a color image window :</h4>
+
+<img src="HMI/assets/SimulationChoiceWindow.png" width="1024"/>
+
 <h4>RGB bands choice:</h4>
 <p>The "RGB bands choice" method is available in the "Generate a color image" window.
 First of all, you need to select the "RGB bands choice" radio button.
@@ -51,10 +59,12 @@ You will then need to indicate in the "R", "G", and "B" spinboxes the band numbe
 Then you can proceed with the method.
 If everything went well, you should see your newly generated image in the first window of the application next to your imported multispectral image.</p>
 
+<h4>Result :</h4>
+
+<img src="HMI/assets/MainWindowFinal.png" width="1024"/>
+
 <h4>Save button:</h4>
 <p>After the generation of your new image, the button "Save" under your newly generated image in the first window of the application is available. If you want to download your image in an RGB format (.png, .jpg), you simply need to click the "Save" button and choose where you want the image file to go.</p>
-
-<br>
 
 <h3>Situation 2: You are using git clone to compile the project yourself</h3>
 
