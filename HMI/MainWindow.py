@@ -198,41 +198,33 @@ class MainWindow(tk.Tk):
         self.__image_sim_label.config(image=self.__img)
 
     def __import_image(self):
-        try:
-            self.__folder_path = filedialog.askopenfilename(
-                title="Select the image file",
-                filetypes=[("Image Files", "*.tiff;*.tif")]
+        self.__folder_path = filedialog.askopenfilename(
+            title="Select the image file",
+            filetypes=[("Image Files", "*.tiff;*.tif")]
+        )
+        
+        if self.__folder_path:
+            # Ask for the metadata file
+            metadata_path = filedialog.askopenfilename(
+                title="Select the wavelength metadata file",
+                filetypes=[("Text Files", "*.txt")],
+                initialdir=os.path.dirname(self.__folder_path)
             )
-
-            if self.__folder_path:
-                # Ask for the metadata file
-                metadata_path = filedialog.askopenfilename(
-                    title="Select the wavelength metadata file",
-                    filetypes=[("Text Files", "*.txt")],
-                    initialdir=os.path.dirname(self.__folder_path)
-                )
                 
-                if metadata_path:
-                    try:
-                        self.__image_ms = FileManager.Load(self.__folder_path, metadata_path)
-                        self.__update_image()
-                        
-                        # Update window title, buttons and labels
-                        self.__update_image_label()
-                        self.__enable_buttons()    
-                        self.__update_data()
-                        
-                    except Exception as e:
-                        print(f"Error during image loading: {str(e)}")
-                        print(f"Error type: {type(e)}")
-                        messagebox.showerror("Error", f"An error occurred while loading the files.")
-                else:
-                    messagebox.showwarning("Warning", "Metadata file is required. Import cancelled.")
+            if metadata_path:
+                try:
+                    self.__image_ms = FileManager.Load(self.__folder_path, metadata_path)
+                    self.__update_image()
+                    # Update window title, buttons and labels
+                    self.__update_image_label()
+                    self.__enable_buttons()    
+                    self.__update_data()    
+                except Exception as exception :
+                    messagebox.showerror("Error", exception.__str__())
             else:
-                messagebox.showwarning("Warning", "Image file is required. Import cancelled.")
-                
-        except Exception as e:
-            messagebox.showerror("Error", f"An error occurred in import image.")
+                messagebox.showwarning("Warning", "Metadata file is required. Import cancelled.")
+        else:
+            messagebox.showwarning("Warning", "Image file is required. Import cancelled.")
 
     def __update_image_label(self):
         self.title(f"SimulFCImage - {self.__image_ms.get_name()}")
@@ -287,23 +279,16 @@ class MainWindow(tk.Tk):
         band_number = self.__band_current_number_text.get(1.0, tk.END).strip()
         try:
             band = int(band_number)
-            self.__change_band(band)
-        except (TypeError, ValueError):
-            messagebox.askokcancel("Input Error", "The band number must be an integer, not a string!")
+            self.__image_ms.set_actualband(band)
+            self.__update_image()
+            self.__update_data()
+        except (NotExistingBandException,ValueError) as exception :
+            if exception.__class__.__name__ == ValueError.__name__ :
+                exception.args = ("The band number must be an integer, not a string!",) # Modifying the exception message so it is more understandable
+            messagebox.askokcancel("Input Error", exception.__str__())
         finally:
             self.__band_current_number_text.delete(1.0, tk.END)
-
-    def __change_band(self, band_number: int):
-        try:
-            if (band_number > self.__image_ms.get_number_bands()) or (band_number < 1):
-                raise NotExistingBandException("The band is nonexistant")
-            else:
-                self.__image_ms.set_actualband(band_number)
-                self.__update_image()
-                self.__update_data()
-        except NotExistingBandException as exception:
-            messagebox.askokcancel("Input Error", exception.__str__())
-
+            
     def quit_application(self):
         self.destroy()  # Close the application
 

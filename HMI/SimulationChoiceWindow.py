@@ -155,32 +155,29 @@ class SimulationChoiceWindow(tk.Toplevel):
                 rgb_values = [spin.get().strip() for spin in self.__rgb_values]
                 if "" in rgb_values:
                     raise EmptyRGBException("Please specify all RGB values")
-                
                 r, g, b = map(int, rgb_values)
                 bands = (
                     self.__image_ms.get_bands()[r-1],
                     self.__image_ms.get_bands()[g-1],
                     self.__image_ms.get_bands()[b-1]
                 )
-                
                 simulator = factory.create(simulation_type, self.__image_ms, bands)
             else:
                 simulator = factory.create(simulation_type, self.__image_ms)
             
             # Execute the simulation
             simulated_image = simulator.simulate()
-            
             # Display the simulated image in the main window
             self.master.display_simulated_image(simulated_image)
-            
             self.destroy()
                 
-        except EmptyRGBException as exception:
-            messagebox.showwarning("Attention", str(exception))
-        except ValueError:
-            messagebox.showwarning("Attention", "Invalid RGB values. Please enter valid numbers.")
-        except IndexError:
-            messagebox.showwarning("Attention", "Invalid band number. Please check the entered values.")
+        except (EmptyRGBException,ValueError,IndexError) as exception:
+            # Those conditions are used for modifying only the ValueError and IndexError message to make them more understandable
+            if exception.__class__.__name__ == ValueError.__name__ :
+                exception.args = ("Invalid RGB values. Please enter valid numbers.",)
+            elif exception.__class__.__name__ == IndexError.__name__ :
+                exception.args = ("Invalid band number. Please check the entered values.",)
+            messagebox.showwarning("Warning", exception.__str__())
 
     def __next_band(self):
         """Changes to next band in the image sequence"""
@@ -219,28 +216,14 @@ class SimulationChoiceWindow(tk.Toplevel):
         band_number = self.__band_number_text.get("1.0", tk.END).strip()
         try:
             band = int(band_number)
-            self.__change_band(band)
-        except (TypeError, ValueError):
-            messagebox.askokcancel("Input Error", "The band number must be an integer, not a string!")
+            self.__image_ms.set_actualband(band)
+            self.__update_preview()
+        except (NotExistingBandException,ValueError) as exception :
+            if exception.__class__.__name__ == ValueError.__name__ :
+                exception.args = ("The band number must be an integer, not a string!",) # Modifying the exception message so it is more understandable
+            messagebox.askokcancel("Input Error", exception.__str__())
         finally:
             self.__band_number_text.delete("1.0", tk.END)
-
-    def __change_band(self, band_number: int):
-        """
-        Allows changing the current band number based on user input.
-        Validates if the band number exists before changing.
-
-        Parameters:
-            - band_number: integer representing the desired band number
-        """
-        try:
-            if (band_number > self.__image_ms.get_number_bands()) or (band_number < 1):
-                raise NotExistingBandException("The band is nonexistant")
-            else:
-                self.__image_ms.set_actualband(band_number)
-                self.__update_preview()
-        except NotExistingBandException as exception:
-            messagebox.askokcancel("Input Error", exception.__str__())
 
     def __update_rgb_state(self):
         """
