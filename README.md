@@ -1,40 +1,58 @@
 <h1> SimulFCImage - LaBabaTcheam C1 </h1>
+
 <h2>Project Goal</h2>
 <p>SimulFCImage is a Python-based application designed for the manipulation of multispectral images,
-allowing users to perceive them in color. With its intuitive user interface, it enables the selection of various simulation methods to generate these images.</p>
-<p> The application offers several simulation methods for the creation of color images, including : </p>
-<h3>"True Color" Generation Method :</h3>
-<p>This method uses specific calculations to generate a true-color image, as it would be perceived by a human being.</p>
-<p>Example of use: Visualizing a multispectral image as a human would see it, in order to compare it with other generated images.</p>
-<h3>"False Color" Generation Method :</h3>
-<p>This method allows users to select three bands from those available in the multispectral image and assign them to a color channel (Red, Green, Blue - RGB) to generate an image.</p>
-<p>Example of use: Isolating the visualization of a specific wavelength to highlight elements invisible to the human eye.</p>
-<h3>Bee Vision Simulation :</h3>
+allowing users to perceive them in color. With its intuitive user interface, it enables the selection of various simulation methods to generate these images.
+The application offers several simulation methods for the creation of color images, including:</p>
+
+<h3>"True Color" Generation Method:</h3>
+<p>This method uses specific calculations to generate a true-color image, as it would be perceived by a human being.
+Example of use: Visualizing a multispectral image as a human would see it, in order to compare it with other generated images.</p>
+
+<h3>"False Color" Generation Method:</h3>
+<p>This method allows users to select three bands from those available in the multispectral image and assign them to a color channel (Red, Green, Blue - RGB) to generate an image.
+Example of use: Isolating the visualization of a specific wavelength to highlight elements invisible to the human eye.</p>
+
+<h3>Bee Vision Simulation:</h3>
 <p>This method generates an image simulating the perception of the multispectral image in the visible spectrum for a bee.</p>
-<h3>Color Blindness Simulation :</h3>
+
+<h3>Color Blindness Simulation:</h3>
 <p>This method produces an image representing how a colorblind person would perceive the multispectral image.</p>
-<h3>Main Features of the Application :</h3>
+
+<h3>Main Features of the Application:</h3>
 <ul>
-  <li>Loading a multispectral image from a file.</li>
-  <li>Selecting the image generation method.</li>
-  <li>Computing and generating the image based on the chosen method.</li>
+  	<li>Loading a multispectral image from a file.</li>
+  	<li>Selecting the image generation method.</li>
+  	<li>Computing and generating the image based on the chosen method.</li>
 	<li>Displaying the generated image with the option to save it.</li>
 </ul>
 
-<h2>How to use the application ?</h2> 
+<h2>How to use the application?</h2> 
 
-<h3>Situation 1 : You want the application compiled as an .exe file</h3>
-<p>Dowload the SimulFCImage.zip file in this GoogleDrive : https://drive.google.com/drive/folders/1uRv_wMsNEgHqScpr94n4Br1E7VYtcmYx?usp=sharing</p>
-<p>(You may want to dowload the dataset folder "Egyptian_Statue" present in the GoogleDrive with the application)</p>
+<h3>Situation 1: You want the application compiled as an .exe file</h3>
+
+<h4>Setup:</h4>
+<p>Download the SimulFCImage.zip file in this Google Drive: https://drive.google.com/drive/folders/1uRv_wMsNEgHqScpr94n4Br1E7VYtcmYx?usp=sharing</p>
+<p>(You may want to download the .tif data files with their metadata .txt in the folder "Teeth" present in the Google Drive with the application)</p>
 <p>Unzip the SimulFCImage.zip.</p>
 <p>Launch the application SimulFCImage.exe. </p>
 <p>A window will open with a button labeled "Import an image."</p>
-<p>Click this button and select a folder containing your multispectral images in .tiff format.</p>
-<p>If you don't have a folder of multispectral images, you can use the test images provided in the project under ['S5_C1_LaBabaTcheam/Testing-Data'](https://github.com/dept-info-iut-dijon/S5_C1_LaBabaTcheam/tree/main/Testing-Data/Egyptian_Statue).</p>
-<p>(The same file as the one available on GoogleDrive)</p>
+<p>Click this button and select your multispectral images in .tiff format.</p>
+<p>Then you will need to import the metadata file in .txt format present with the .tiff image.</p>
 <p>Once you click OK, your image will appear in the application.</p>
 <p>You can view each band of the image by clicking the "Next" and "Previous" buttons.</p>
-<p>Please note that features such as "Generate a color image" and the "Save" button are not yet implemented.</p>
+
+<h3>Generate a color image:</h3>
+
+<h4>RGB bands choice:</h4>
+<p>The "RGB bands choice" method is available in the "Generate a color image" window.
+First of all, you need to select the "RGB bands choice" radio button.
+You will then need to indicate in the "R", "G", and "B" spinboxes the band number you want to assign to each "RGB" channel.
+Then you can proceed with the method.
+If everything went well, you should see your newly generated image in the first window of the application next to your imported multispectral image.</p>
+
+<h4>Save button:</h4>
+<p>After the generation of your new image, the button "Save" under your newly generated image in the first window of the application is available. If you want to download your image in an RGB format (.png, .jpg), you simply need to click the "Save" button and choose where you want the image file to go.</p>
 
 <br>
 
@@ -54,7 +72,7 @@ pip install Pillow rasterio numpy cx_Freeze
 ```bash
 S5_C1_LaBabaTcheam
 ├─Exceptions
-│ └─NotExistingBandException.py
+│ └─...
 ├─HMI
 │ ├─assets
 │ │ └─...
@@ -80,7 +98,7 @@ S5_C1_LaBabaTcheam
 ├─Storage
 │ ├─FileManager.py
 │ └─ImageManager.py
-├─Testing-Data
+├─UnitTests
 │ └─...
 ├─.gitignore
 ├─Program.py
