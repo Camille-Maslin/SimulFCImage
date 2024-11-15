@@ -29,10 +29,10 @@ class MainWindow(tk.Tk):
 
         # Initialization of the factory
         factory = SimulatorFactory.instance()
-        factory.register("band_choice", CreateBandChoiceSimulator())
-        factory.register("human", CreateHumanSimulator())
-        factory.register("bee", CreateBeeSimulator())
-        factory.register("daltonien", CreateDaltonianSimulator())
+        factory.register("RGB bands choice", CreateBandChoiceSimulator())
+        factory.register("True color simulation", CreateHumanSimulator())
+        factory.register("Bee color simulation", CreateBeeSimulator())
+        factory.register("Daltonian color simulation", CreateDaltonianSimulator())
 
         # Set up the main window properties
         self.title("SimulFCImage - Main Window")
@@ -48,7 +48,6 @@ class MainWindow(tk.Tk):
         self.__style.configure('TLabel', font=('Arial', 14))  # Label style
 
         # Initialize instance variables
-        self.__image_path = None  # Path to the imported image
         self.__image_label = None  # Label to display the image
 
         # Initialize to None the ImageMS class object
@@ -199,43 +198,33 @@ class MainWindow(tk.Tk):
         self.__image_sim_label.config(image=self.__img)
 
     def __import_image(self):
-        try:
-            self.__folder_path = filedialog.askopenfilename(
-                title="Select the image file",
-                filetypes=[("Image Files", "*.tiff;*.tif")]
+        self.__folder_path = filedialog.askopenfilename(
+            title="Select the image file",
+            filetypes=[("Image Files", "*.tiff;*.tif")]
+        )
+        
+        if self.__folder_path:
+            # Ask for the metadata file
+            metadata_path = filedialog.askopenfilename(
+                title="Select the wavelength metadata file",
+                filetypes=[("Text Files", "*.txt")],
+                initialdir=os.path.dirname(self.__folder_path)
             )
-
-            if self.__folder_path:
-                # Ask for the metadata file
-                metadata_path = filedialog.askopenfilename(
-                    title="Select the wavelength metadata file",
-                    filetypes=[("Text Files", "*.txt")],
-                    initialdir=os.path.dirname(self.__folder_path)
-                )
                 
-                if metadata_path:
-                    try:
-                        self.__image_ms = FileManager.Load(self.__folder_path, metadata_path)
-                        self.__update_image()
-                        
-                        # Update window title, buttons and labels
-                        self.__update_image_label()
-                        self.__enable_buttons()    
-                        self.__update_data()
-                        
-                    except Exception as e:
-                        print(f"Error during image loading: {str(e)}")
-                        print(f"Error type: {type(e)}")
-                        messagebox.showerror("Error", f"An error occurred while loading the files.")
-                else:
-                    messagebox.showwarning("Warning", "Metadata file is required. Import cancelled.")
+            if metadata_path:
+                try:
+                    self.__image_ms = FileManager.Load(self.__folder_path, metadata_path)
+                    self.__update_image()
+                    # Update window title, buttons and labels
+                    self.__update_image_label()
+                    self.__enable_buttons()    
+                    self.__update_data()    
+                except Exception as exception :
+                    messagebox.showerror("Error", exception.__str__())
             else:
-                messagebox.showwarning("Warning", "Image file is required. Import cancelled.")
-                
-        except Exception as e:
-            print(f"Unexpected error in import_image: {str(e)}")
-            print(f"Error type: {type(e)}")
-            messagebox.showerror("Error", f"An error occurred in import image.")
+                messagebox.showwarning("Warning", "Metadata file is required. Import cancelled.")
+        else:
+            messagebox.showwarning("Warning", "Image file is required. Import cancelled.")
 
     def __update_image_label(self):
         self.title(f"SimulFCImage - {self.__image_ms.get_name()}")
@@ -290,31 +279,23 @@ class MainWindow(tk.Tk):
         band_number = self.__band_current_number_text.get(1.0, tk.END).strip()
         try:
             band = int(band_number)
-            self.__change_band(band)
-        except (TypeError, ValueError):
-            messagebox.askokcancel("Input Error", "The band number must be an integer, not a string!")
+            self.__image_ms.set_actualband(band)
+            self.__update_image()
+            self.__update_data()
+        except (NotExistingBandException,ValueError) as exception :
+            if exception.__class__.__name__ == ValueError.__name__ :
+                exception.args = ("The band number must be an integer, not a string!",) # Modifying the exception message so it is more understandable
+            messagebox.askokcancel("Input Error", exception.__str__())
         finally:
             self.__band_current_number_text.delete(1.0, tk.END)
-
-    def __change_band(self, band_number: int):
-        try:
-            if (band_number > self.__image_ms.get_number_bands()) or (band_number < 1):
-                raise NotExistingBandException("The band is nonexistant")
-            else:
-                self.__image_ms.set_actualband(band_number)
-                self.__update_image()
-                self.__update_data()
-        except NotExistingBandException as exception:
-            messagebox.askokcancel("Input Error", exception.__str__())
-
+            
     def quit_application(self):
         self.destroy()  # Close the application
 
-    def display_simulated_image(self, simulated_image):
+    def display_simulated_image(self, simulated_image : np.ndarray):
         """
         Displays the simulated image in the main window.
-        
-        Args:
+        args:
             simulated_image (np.ndarray): Simulated image to display
         """
         # Convert numpy array to PIL image
@@ -333,22 +314,14 @@ class MainWindow(tk.Tk):
         """
         Opens a dialog box to save the simulated image
         """
-        if self._simulated_image is None:
-            return
-        
-        file_types = [
-            ('PNG files', '*.png'),
-            ('JPEG files', '*.jpg'),
-            ('All files', '*.*')
-        ]
-        
-        file_path = filedialog.asksaveasfilename(
+        file_path = filedialog.asksaveasfilename (
             defaultextension='.png',
-            filetypes=file_types,
+            filetypes=[
+                ('PNG files','*.png'),
+                ('JPEG files','*.jpg'),
+                ('TIF files','*.tif'),
+                ('All files','*')
+            ],
             title='Save Simulated Image'
         )
-        
-        if file_path:
-            # Convert numpy array to PIL image
-            image = Image.fromarray((self._simulated_image * 255).astype(np.uint8))
-            image.save(file_path)
+        FileManager.convert_to_image_and_save(self._simulated_image, file_path) 
