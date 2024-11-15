@@ -16,8 +16,25 @@ class Band:
         
         Author : Lakhdar Gibril
         """
+        # Validate number
+        if number <= 0:
+            raise ValueError("Band number must be positive")
+            
+        # Validate shade_of_grey
+        if shade_of_grey.size == 0:
+            raise ValueError("Shade of grey array cannot be empty")
+            
+        # Validate wavelength
+        if not isinstance(wave_length, tuple) or len(wave_length) != 2:
+            raise ValueError("Wavelength must be a tuple of two values")
+        if wave_length[0] < 0 or wave_length[1] < 0:
+            raise ValueError("Wavelengths must be positive")
+        if wave_length[0] > wave_length[1]:
+            raise ValueError("Min wavelength cannot be greater than max wavelength")
+
         self.__number = number
-        self.__shade_of_grey = shade_of_grey
+        # Create a copy of the array to ensure immutability
+        self.__shade_of_grey = shade_of_grey.copy()
         self.__wave_length = wave_length
 
     def get_shade_of_grey (self) -> np.ndarray :
@@ -27,7 +44,7 @@ class Band:
 
         Author : Lakhdar Gibril
         """ 
-        return self.__shade_of_grey
+        return self.__shade_of_grey.copy()
 
 
     def get_wavelength (self) -> tuple : 

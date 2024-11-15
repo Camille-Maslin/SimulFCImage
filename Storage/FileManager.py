@@ -34,7 +34,6 @@ class FileManager :
         image_to_save = Image.fromarray((image * FileManager.MAX_COLOR_BITS).astype(np.uint8)) # To convert the ndarray into a PIL image
         image_to_save.save(path)
 
-
     @staticmethod
     def Load(image_path: str, metadata_path: str) -> ImageMS:
         """
@@ -48,11 +47,16 @@ class FileManager :
         Author : Moreau Alexandre
         Author : Maslin Camille 
         """
+        # Verify the format of the file
+        if not image_path.lower().endswith('.tif'):
+            raise ValueError("Unsupported image format")
+        
         metadata = FileManager.open_and_get_metadata(metadata_path, image_path)
         image_ms = FileManager.open_and_get_image_and_bands_data(image_path, metadata)
         return image_ms
 
     
+    @staticmethod
     def open_and_get_metadata(file_path : str, image_path : str) -> list :         
         """
         Method which allow to open and get the metadata of the image 
@@ -90,23 +94,24 @@ class FileManager :
             - metadata (list) : list of metadata for the bands wavelength
         @return : an ImageMS object 
         Author : Lakhdar Gibril
-        """ 
-        image = Image.open(image_path)
-        bands = []
-        for num_band in range (1, image.n_frames) :
-            image.seek(num_band)
-            band_shade = np.array(image)
-            match image.mode : 
-                case FileManager.SHADE_OF_GREY : 
-                    band_shade = np.array(image)*FileManager.MAX_COLOR_BITS
-                case FileManager.IMAGE_16BIT : 
-                    band_shade = np.array(image)/FileManager.NUMBER_TO_CONVERT_TO_8BITS
-            # Use num_band - 1 to align with wavelengths array
-            wavelength_index = num_band - 1
-            band = ImageManager.create_band_instance([
-                        num_band,  # Keep original band number
-                        band_shade,
-                        (metadata[wavelength_index], metadata[wavelength_index])])
-            bands.append(band)
-        image_ms = ImageManager.create_imagems_instance([image_path, metadata[0], metadata[-1], image.size, bands])
-        return image_ms
+        """
+        with Image.open(image_path) as image:
+            bands = []
+            print(image.n_frames)
+            for num_band in range(1, image.n_frames):
+                image.seek(num_band)
+                band_shade = np.array(image)
+                match image.mode : 
+                    case FileManager.SHADE_OF_GREY : 
+                        band_shade = np.array(image)*FileManager.MAX_COLOR_BITS
+                    case FileManager.IMAGE_16BIT : 
+                        band_shade = np.array(image)/FileManager.NUMBER_TO_CONVERT_TO_8BITS
+                # Use num_band - 1 to align with wavelengths array
+                wavelength_index = num_band - 1
+                band = ImageManager.create_band_instance([
+                            num_band,  # Keep original band number
+                            band_shade,
+                            (metadata[wavelength_index], metadata[wavelength_index])])
+                bands.append(band)
+            image_ms = ImageManager.create_imagems_instance([image_path, metadata[0], metadata[-1], image.size, bands])
+            return image_ms
