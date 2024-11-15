@@ -29,10 +29,10 @@ class MainWindow(tk.Tk):
 
         # Initialization of the factory
         factory = SimulatorFactory.instance()
-        factory.register("band_choice", CreateBandChoiceSimulator())
-        factory.register("human", CreateHumanSimulator())
-        factory.register("bee", CreateBeeSimulator())
-        factory.register("daltonien", CreateDaltonianSimulator())
+        factory.register("RGB bands choice", CreateBandChoiceSimulator())
+        factory.register("True color simulation", CreateHumanSimulator())
+        factory.register("Bee color simulation", CreateBeeSimulator())
+        factory.register("Daltonian color simulation", CreateDaltonianSimulator())
 
         # Set up the main window properties
         self.title("SimulFCImage - Main Window")

@@ -59,20 +59,14 @@ class SimulationChoiceWindow(tk.Toplevel):
         tk.Label(self.__simulation_frame, text="Simulation choice", bg="white", font=("Arial", 14, "bold")).pack(anchor="w", pady=(0, 10))
 
         # Radio buttons for simulation methods
-        self.__sim_choice = tk.StringVar(value="rgb")
-        
-        ttk.Radiobutton(self.__simulation_frame, text="True color simulation", 
-                       variable=self.__sim_choice, value="true",
-                       command=self.__update_rgb_state).pack(anchor="w", pady=5)
-        ttk.Radiobutton(self.__simulation_frame, text="Daltonien color simulation", 
-                       variable=self.__sim_choice, value="daltonien",
-                       command=self.__update_rgb_state).pack(anchor="w", pady=5)
-        ttk.Radiobutton(self.__simulation_frame, text="Bee color simulation", 
-                       variable=self.__sim_choice, value="bee",
-                       command=self.__update_rgb_state).pack(anchor="w", pady=5)
-        ttk.Radiobutton(self.__simulation_frame, text="RGB bands choice", 
-                       variable=self.__sim_choice, value="rgb",
-                       command=self.__update_rgb_state).pack(anchor="w", pady=5)
+        factory = SimulatorFactory.instance()
+
+        self.__sim_choice = tk.StringVar(value=factory.simulators[0])
+
+        for value in factory.simulators:
+            ttk.Radiobutton(self.__simulation_frame, text=value, 
+                        variable=self.__sim_choice, value=value,
+                        command=self.__update_rgb_state).pack(anchor="w", pady=5)
 
         # Frame for RGB spinboxes
         self.__rgb_frame = tk.Frame(self.__simulation_frame, bg="white")
@@ -157,7 +151,7 @@ class SimulationChoiceWindow(tk.Toplevel):
             simulation_type = self.__sim_choice.get()
             factory = SimulatorFactory.instance()
             
-            if simulation_type == "rgb":
+            if simulation_type == "RGB bands choice":
                 rgb_values = [spin.get().strip() for spin in self.__rgb_values]
                 if "" in rgb_values:
                     raise EmptyRGBException("Please specify all RGB values")
@@ -169,7 +163,7 @@ class SimulationChoiceWindow(tk.Toplevel):
                     self.__image_ms.get_bands()[b-1]
                 )
                 
-                simulator = factory.create("band_choice", self.__image_ms, bands)
+                simulator = factory.create(simulation_type, self.__image_ms, bands)
             else:
                 simulator = factory.create(simulation_type, self.__image_ms)
             
@@ -254,7 +248,7 @@ class SimulationChoiceWindow(tk.Toplevel):
         Enables spinboxes only when RGB bands choice is selected.
         Updates labels color to indicate enabled/disabled state.
         """
-        state = 'normal' if self.__sim_choice.get() == "rgb" else 'disabled'
+        state = 'normal' if self.__sim_choice.get() == "RGB bands choice" else 'disabled'
         
         # Update spinboxes state
         for spinbox in self.__rgb_values:
