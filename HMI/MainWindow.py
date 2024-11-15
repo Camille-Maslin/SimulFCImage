@@ -334,7 +334,7 @@ class MainWindow(tk.Tk):
             filetypes=[
                 ('PNG files','*.png'),
                 ('JPEG files','*.jpg'),
-                ('TIF files','*.jpg'),
+                ('TIF files','*.tif'),
                 ('All files','*')
             ],
             title='Save Simulated Image'
