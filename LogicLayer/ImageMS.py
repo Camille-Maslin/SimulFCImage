@@ -1,6 +1,6 @@
 from PIL import Image
 from LogicLayer.Band import Band
-from Exceptions import NotExistingBandException
+from Exceptions.NotExistingBandException import NotExistingBandException
 
 class ImageMS (Image.Image) : 
     """
@@ -71,10 +71,10 @@ class ImageMS (Image.Image) :
         args: 
             - band_number: an integer representing the band number to set as the current band
         """
-        if 1 <= band_number <= len(self.__bands):
-            self.__current = self.__bands[band_number - 1]
-        else:
+        if ((1 > band_number) or (band_number > len(self.__bands))):
             raise NotExistingBandException("The band is nonexistant")
+        else :
+            self.__current = self.__bands[band_number - 1]
 
     def get_bands(self) -> list : 
         """

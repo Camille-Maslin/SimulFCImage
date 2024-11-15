@@ -1,15 +1,10 @@
-from LogicLayer.Factory.CreateSimulating.ICreateSimulator import SimulatorFactory
+from LogicLayer.Factory.CreateSimulating.ICreateSimulator import ICreateSimulator 
 from LogicLayer.Factory.Simulating.BandChoiceSimulating import BandChoiceSimulating
+from LogicLayer import ImageMS
 
-class CreateBandChoiceSimulator(SimulatorFactory):
-    def create_simulator(self, image_ms):
-        """
-        Create a simulator for band choice.
+class CreateBandChoiceSimulator(ICreateSimulator):
 
-        Args:
-            image_ms: An ImageMS object representing the multispectral image.
-
-        Returns:
-            An instance of BandChoiceSimulating.
-        """
-        return BandChoiceSimulating(image_ms)
+    def create_simulator(self, image_ms: ImageMS, bands_number: tuple = ()):
+        if not bands_number:
+            raise ValueError("Band numbers are required for RGB simulation")
+        return BandChoiceSimulating(image_ms, bands_number)
