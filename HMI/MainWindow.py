@@ -2,7 +2,9 @@ import os
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import numpy as np
+
 from PIL import Image, ImageTk
+
 from HMI.SimulationChoiceWindow import SimulationChoiceWindow
 from Storage.FileManager import FileManager
 from LogicLayer.Factory.SimulatorFactory import SimulatorFactory

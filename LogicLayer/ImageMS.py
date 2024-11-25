@@ -1,4 +1,5 @@
 from PIL import Image
+
 from LogicLayer.Band import Band
 from Exceptions.NotExistingBandException import NotExistingBandException
 from Exceptions.ErrorMessages import ErrorMessages
