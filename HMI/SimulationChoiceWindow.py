@@ -28,6 +28,15 @@ class SimulationChoiceWindow(tk.Toplevel):
         """
         super().__init__(parent)
         self.__image_ms = image_ms  # Store the imagems
+        self.__daltonian_types = [
+            "Deuteranopia", 
+            "Protanopia", 
+            "Deuteranomaly", 
+            "Protanomaly", 
+            "Tritanopia", 
+            "Tritanomaly",
+            "Achromatopsia"
+        ]
         self.title("Choose a simulation method")
         self.geometry("1000x800")
         self.configure(bg='white')
@@ -60,33 +69,58 @@ class SimulationChoiceWindow(tk.Toplevel):
 
         # Radio buttons for simulation methods
         factory = SimulatorFactory.instance()
-
         self.__sim_choice = tk.StringVar(value=factory.simulators[0])
 
+        # Create a dictionary to store the frames associated with each type of simulation
+        self.__simulation_options = {}
+
         for value in factory.simulators:
+            # Create a frame for each simulation option
+            option_frame = tk.Frame(self.__simulation_frame, bg="white")
+            self.__simulation_options[value] = option_frame
+            
+            # Add the radio button
             ttk.Radiobutton(self.__simulation_frame, text=value, 
                         variable=self.__sim_choice, value=value,
                         command=self.__update_rgb_state).pack(anchor="w", pady=5)
-
-        # Frame for RGB spinboxes
-        self.__rgb_frame = tk.Frame(self.__simulation_frame, bg="white")
-        self.__rgb_frame.pack(anchor="w", pady=10)
-
-        # Labels et Spinboxes pour R, G, B
-        labels = ["R", "G", "B"]
-        self.__rgb_values = []
-        self.__rgb_labels = []
-        
-        for i, label in enumerate(labels):
-            lbl = tk.Label(self.__rgb_frame, text=label, bg="white")
-            lbl.grid(row=0, column=i*2, padx=5)
-            self.__rgb_labels.append(lbl)
             
-            spinbox = ttk.Spinbox(self.__rgb_frame, from_=1, to=self.__image_ms.get_number_bands(), width=5)
-            spinbox.grid(row=0, column=i*2+1, padx=5)
-            self.__rgb_values.append(spinbox)
+            # RGB bands choice spinboxes
+            if value == "RGB bands choice":
+                # Frame for RGB spinboxes
+                self.__rgb_frame = tk.Frame(option_frame, bg="white")
+                self.__rgb_frame.pack(anchor="w", pady=5)
 
-        # Initialize spinboxes state
+                # Labels and Spinboxes for R, G, B
+                labels = ["R", "G", "B"]
+                self.__rgb_values = []
+                self.__rgb_labels = []
+                
+                for i, label in enumerate(labels):
+                    lbl = tk.Label(self.__rgb_frame, text=label, bg="white")
+                    lbl.grid(row=0, column=i*2, padx=5)
+                    self.__rgb_labels.append(lbl)
+                    
+                    spinbox = ttk.Spinbox(self.__rgb_frame, from_=1, to=self.__image_ms.get_number_bands(), width=5)
+                    spinbox.grid(row=0, column=i*2+1, padx=5)
+                    self.__rgb_values.append(spinbox)
+                
+                option_frame.pack(anchor="w", padx=(20, 0))
+            
+            # Daltonian color simulation combobox
+            elif value == "Daltonian color simulation":
+                self.__daltonian_frame = option_frame
+                self.__daltonian_type = ttk.Combobox(
+                    option_frame,
+                    values=self.__daltonian_types,
+                    state='readonly',
+                    width=15
+                )
+                self.__daltonian_type.set(self.__daltonian_types[0])
+                self.__daltonian_type.bind('<<ComboboxSelected>>', self.__on_daltonian_type_changed)
+                self.__daltonian_type.pack(pady=5)
+                option_frame.pack(anchor="w", padx=(20, 0))
+
+        # Initialize widgets state
         self.__update_rgb_state()
 
         # Frame for image preview
@@ -162,8 +196,15 @@ class SimulationChoiceWindow(tk.Toplevel):
                     self.__image_ms.get_bands()[b-1]
                 )
                 simulator = factory.create(simulation_type, self.__image_ms, bands)
+            elif simulation_type == "Daltonian color simulation":
+                simulator = factory.create(
+                    simulation_type, 
+                    self.__image_ms,
+                    None,
+                    daltonian_type=self.__daltonian_type.get()
+                )
             else:
-                simulator = factory.create(simulation_type, self.__image_ms)
+                simulator = factory.create(simulation_type, self.__image_ms, None)
             
             # Execute the simulation
             simulated_image = simulator.simulate()
@@ -226,17 +267,27 @@ class SimulationChoiceWindow(tk.Toplevel):
             self.__band_number_text.delete("1.0", tk.END)
 
     def __update_rgb_state(self):
-        """
-        Updates the state of RGB spinboxes based on the selected simulation method.
-        Enables spinboxes only when RGB bands choice is selected.
-        Updates labels color to indicate enabled/disabled state.
-        """
-        state = 'normal' if self.__sim_choice.get() == "RGB bands choice" else 'disabled'
+        """Updates the widgets state based on the chosen simulation"""
+        simulation = self.__sim_choice.get()
         
-        # Update spinboxes state
+        # RGB spinboxes state
+        rgb_state = 'normal' if simulation == "RGB bands choice" else 'disabled'
         for spinbox in self.__rgb_values:
-            spinbox.config(state=state)
-        
-        # Update labels color
+            spinbox.config(state=rgb_state)
         for label in self.__rgb_labels:
-            label.config(fg='black' if state == 'normal' else 'gray')
+            label.config(fg='black' if rgb_state == 'normal' else 'gray')
+            
+        # Daltonian color simulation combobox state
+        self.__daltonian_type.config(
+            state='readonly' if simulation == "Daltonian color simulation" else 'disabled'
+        )
+
+    def __on_daltonian_type_changed(self, event):
+        """Callback when the daltonian type changes"""
+        self.__update_preview()
+
+    def get_simulation_parameters(self):
+        """Returns the simulation parameters"""
+        return {
+            'daltonian_type': self.__daltonian_type.get() if self.__sim_choice.get() == "Daltonian color simulation" else None
+        }

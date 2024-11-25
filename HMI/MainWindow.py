@@ -310,7 +310,7 @@ class MainWindow(tk.Tk):
         """
         Opens a dialog box to save the simulated image
         """
-        file_path = filedialog.asksaveasfilename (
+        file_path = filedialog.asksaveasfilename(
             defaultextension='.png',
             filetypes=[
                 ('PNG files','*.png'),
@@ -320,4 +320,6 @@ class MainWindow(tk.Tk):
             ],
             title='Save Simulated Image'
         )
-        FileManager.convert_to_image_and_save(self._simulated_image, file_path) 
+        
+        if file_path:
+            FileManager.convert_to_image_and_save(self._simulated_image, file_path) 

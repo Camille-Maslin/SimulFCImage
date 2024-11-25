@@ -1,6 +1,7 @@
 from typing import Dict, List
 from LogicLayer.Factory.CreateSimulating.ICreateSimulator import ICreateSimulator
 from LogicLayer.Factory.Simulating.SimulatingMethod import SimulateMethod as SimulatingMethod
+from LogicLayer.ImageMS import ImageMS
 
 class SimulatorFactory:
     """
@@ -42,25 +43,23 @@ class SimulatorFactory:
         """
         return list(self.__builders.keys())
 
-    def create(self, name: str, image_ms, bands_number: tuple = ()) -> SimulatingMethod:
+    def create(self, simulation_type, image_ms, bands, **kwargs):
         """
         Creates a simulator using the registered constructor for the given name.
-
+        
         Args:
-            name (str): The name of the simulator to create.
-            image_ms: An ImageMS object representing the multispectral image.
-            bands_number (tuple): Optional tuple of band numbers for RGB simulation.
-
+            simulation_type (str): The name of the simulator to create
+            image_ms (ImageMS): The multispectral image object
+            bands (tuple): Band numbers for RGB simulation
+            **kwargs: Additional arguments (like daltonian_type)
+        
         Returns:
-            SimulatingMethod: An instance of the created simulator.
-
-        Raises:
-            ValueError: If the simulator is not registered.
+            SimulatingMethod: An instance of the created simulator
         """
-        builder = self.__builders.get(name)
+        builder = self.__builders.get(simulation_type)
         if not builder:
-            raise ValueError(f"Simulator '{name}' not registered.")
-        return builder.create_simulator(image_ms, bands_number)
+            raise ValueError(f"Simulator '{simulation_type}' not registered.")
+        return builder.create_simulator(image_ms, bands, **kwargs)
 
     def register(self, name: str, builder: ICreateSimulator) -> None:
         """
