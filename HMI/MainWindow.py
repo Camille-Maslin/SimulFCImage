@@ -1,16 +1,17 @@
+import os
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
+import numpy as np
 from PIL import Image, ImageTk
-from Storage.FileManager import FileManager
 from HMI.SimulationChoiceWindow import SimulationChoiceWindow
-from Exceptions.NotExistingBandException import NotExistingBandException
-import os
+from Storage.FileManager import FileManager
 from LogicLayer.Factory.SimulatorFactory import SimulatorFactory
 from LogicLayer.Factory.CreateSimulating.CreateBandChoiceSimulating import CreateBandChoiceSimulator
 from LogicLayer.Factory.CreateSimulating.CreateHumanSimulating import CreateHumanSimulator
 from LogicLayer.Factory.CreateSimulating.CreateBeeSimulating import CreateBeeSimulator
 from LogicLayer.Factory.CreateSimulating.CreateDaltonianSimulating import CreateDaltonianSimulator
-import numpy as np
+from Exceptions.ErrorMessages import ErrorMessages
+from Exceptions.NotExistingBandException import NotExistingBandException
 
 class MainWindow(tk.Tk):
     """
@@ -218,9 +219,9 @@ class MainWindow(tk.Tk):
                 except Exception as exception :
                     messagebox.showerror("Error", exception.__str__())
             else:
-                messagebox.showwarning("Warning", "Metadata file is required. Import cancelled.")
+                messagebox.showwarning("Warning", ErrorMessages.METADATA_REQUIRED)
         else:
-            messagebox.showwarning("Warning", "Image file is required. Import cancelled.")
+            messagebox.showwarning("Warning", ErrorMessages.IMAGE_REQUIRED)
 
     def __update_image_label(self):
         self.title(f"SimulFCImage - {self.__image_ms.get_name()}")
@@ -243,7 +244,7 @@ class MainWindow(tk.Tk):
         if self.__image_ms is not None:
             SimulationChoiceWindow(self, self.__image_ms)
         else:
-            messagebox.showwarning("Warning", "Please import an image first.")
+            messagebox.showwarning("Warning", ErrorMessages.IMPORT_FIRST)
 
     def __next_band(self):
         self.__image_ms.next_band()
@@ -280,7 +281,7 @@ class MainWindow(tk.Tk):
             self.__update_data()
         except (NotExistingBandException,ValueError) as exception :
             if exception.__class__.__name__ == ValueError.__name__ :
-                exception.args = ("The band number must be an integer, not a string!",) # Modifying the exception message so it is more understandable
+                exception.args = (ErrorMessages.BAND_NUMBER_TYPE,) # Modifying the exception message so it is more understandable
             messagebox.askokcancel("Input Error", exception.__str__())
         finally:
             self.__band_current_number_text.delete(1.0, tk.END)

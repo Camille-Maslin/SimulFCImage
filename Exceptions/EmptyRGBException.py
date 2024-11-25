@@ -1,4 +1,6 @@
-class EmptyRGBException(Exception):
+from Exceptions.BaseException import BaseException
+
+class EmptyRGBException(BaseException):
     """
     Exception raised when RGB values are not all specified.
     
@@ -11,13 +13,5 @@ class EmptyRGBException(Exception):
             - message (str) : a string of the error message 
         Author : Camille Maslin
         """
-        self.__message = message
-        super().__init__() 
+        super().__init__(message) 
     
-    def __str__(self) -> str : 
-        """
-        Method __str__() which allow to display the exception message
-        @return : str 
-        Author : Lakhdar Gibril
-        """
-        return self.__message

@@ -1,6 +1,7 @@
 from PIL import Image
 from LogicLayer.Band import Band
 from Exceptions.NotExistingBandException import NotExistingBandException
+from Exceptions.ErrorMessages import ErrorMessages
 
 class ImageMS (Image.Image) : 
     """
@@ -72,7 +73,7 @@ class ImageMS (Image.Image) :
             - band_number: an integer representing the band number to set as the current band
         """
         if ((1 > band_number) or (band_number > len(self.__bands))):
-            raise NotExistingBandException("The band is nonexistant")
+            raise NotExistingBandException(ErrorMessages.INVALID_BAND_NUMBER)
         else :
             self.__current = self.__bands[band_number - 1]
 

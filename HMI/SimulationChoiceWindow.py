@@ -1,11 +1,11 @@
 import tkinter as tk
-from tkinter import ttk
-from LogicLayer.ImageMS import ImageMS 
+from tkinter import ttk,messagebox
 from PIL import Image, ImageTk
-import tkinter.messagebox as messagebox
+from LogicLayer.ImageMS import ImageMS 
+from LogicLayer.Factory.SimulatorFactory import SimulatorFactory
 from Exceptions.NotExistingBandException import NotExistingBandException
 from Exceptions.EmptyRGBException import EmptyRGBException
-from LogicLayer.Factory.SimulatorFactory import SimulatorFactory
+from Exceptions.ErrorMessages import ErrorMessages
 
 class SimulationChoiceWindow(tk.Toplevel):
     """
@@ -188,7 +188,7 @@ class SimulationChoiceWindow(tk.Toplevel):
             if simulation_type == "RGB bands choice":
                 rgb_values = [spin.get().strip() for spin in self.__rgb_values]
                 if "" in rgb_values:
-                    raise EmptyRGBException("Please specify all RGB values")
+                    raise EmptyRGBException(ErrorMessages.ENTER_ALL_RGB_VALUES)
                 r, g, b = map(int, rgb_values)
                 bands = (
                     self.__image_ms.get_bands()[r-1],
@@ -215,9 +215,9 @@ class SimulationChoiceWindow(tk.Toplevel):
         except (EmptyRGBException,ValueError,IndexError) as exception:
             # Those conditions are used for modifying only the ValueError and IndexError message to make them more understandable
             if exception.__class__.__name__ == ValueError.__name__ :
-                exception.args = ("Invalid RGB values. Please enter valid numbers.",)
+                exception.args = (ErrorMessages.INVALID_RGB_VALUES,)
             elif exception.__class__.__name__ == IndexError.__name__ :
-                exception.args = ("Invalid band number. Please check the entered values.",)
+                exception.args = (ErrorMessages.INVALID_BAND_NUMBER,)
             messagebox.showwarning("Warning", exception.__str__())
 
     def __next_band(self):

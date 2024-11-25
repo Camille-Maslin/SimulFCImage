@@ -1,8 +1,9 @@
-from LogicLayer.ImageMS import ImageMS
-from PIL import Image 
 import numpy as np
+from PIL import Image 
 from Storage.ImageManager import ImageManager
+from LogicLayer.ImageMS import ImageMS
 from Exceptions.MetaDataNotFoundException import MetaDataNotFoundException
+from Exceptions.ErrorMessages import ErrorMessages
 
 
 class FileManager : 
@@ -53,7 +54,7 @@ class FileManager :
         """
         # Verify the format of the file
         if not image_path.lower().endswith('.tif'):
-            raise ValueError("Unsupported image format")
+            raise ValueError(ErrorMessages.UNSUPPORTED_FORMAT)
         
         metadata = FileManager.open_and_get_metadata(metadata_path, image_path)
         image_ms = FileManager.open_and_get_image_and_bands_data(image_path, metadata)
@@ -87,7 +88,7 @@ class FileManager :
                     wavelengths.extend(values)
             if (len(wavelengths) == 0): # If none of the data were found we raise an exception
                 file_name = file_path.split('/')[-1]
-                raise MetaDataNotFoundException(f"One of the metadata is missing in your {file_name}, please check if there is a missing label in your file")
+                raise MetaDataNotFoundException(ErrorMessages.METADATA_ERROR)
         return wavelengths
 
     def open_and_get_image_and_bands_data(image_path : str, metadata : list) -> ImageMS :
@@ -101,7 +102,6 @@ class FileManager :
         """
         with Image.open(image_path) as image:
             bands = []
-            print(image.n_frames)
             for num_band in range(1, image.n_frames):
                 image.seek(num_band)
                 band_shade = np.array(image)
