@@ -57,19 +57,19 @@ class MainWindow(tk.Tk):
         # Initialize to None the ImageMS class object
         self.__image_ms = None
 
-        # Initialize the user interface widgets
-        self.__initialize_widgets()
+        # Initialize the user interface 
+        self.__init_data_frames()
+        self.__init_labels_and_texts()
+        self.__init_controls()
+        self.__init_logos()
+
         # Display a default PNG image at startup
         self.__display_default_image()
 
         # Attribute to store the simulated image
         self._simulated_image = None
-
-    def __initialize_widgets(self):
-        """
-        Initializes the main interface widgets, including frames, labels, and buttons.
-        Sets up the layout for displaying image data and controls for user interaction.
-        """
+        
+    def __init_data_frames(self):
         # Main frame to contain the grid layout
         self.__main_frame = tk.Frame(self, bg=ResourceManager.BACKGROUND_COLOR)
         self.__main_frame.grid(sticky="nsew")
@@ -82,6 +82,35 @@ class MainWindow(tk.Tk):
         self.__image_data_frame = tk.Frame(self.__main_frame, bg=ResourceManager.BACKGROUND_COLOR)
         self.__image_data_frame.grid(row=0, column=0, padx=20, pady=20, sticky="nw")
 
+        # Controls section for importing images and generating simulations
+        self.__controls_frame = tk.Frame(self.__main_frame, bg=ResourceManager.BACKGROUND_COLOR)
+        self.__controls_frame.grid(row=1, column=0, padx=20, pady=20, sticky="nw")
+
+        # Image Display Section
+        self.__image_display_frame = tk.Frame(self.__main_frame, bg=ResourceManager.BACKGROUND_COLOR)
+        self.__image_display_frame.grid(row=0, column=1, rowspan=2, padx=20, pady=20, sticky="nsew")
+
+        # Frame to hold both imported and simulated images side by side
+        self.__images_frame = tk.Frame(self.__image_display_frame, bg=ResourceManager.BACKGROUND_COLOR)
+        self.__images_frame.pack(pady=(0, 5), fill="both", expand=True)
+
+        # Frame for imported image
+        self.__imported_image_frame = tk.Frame(self.__images_frame, bg=ResourceManager.BACKGROUND_COLOR)
+        self.__imported_image_frame.pack(side=tk.LEFT, padx=10, fill="both", expand=True)
+
+        # Frame for navigation buttons (Previous/Next)
+        self.__navigation_frame = tk.Frame(self.__imported_image_frame, bg=ResourceManager.BACKGROUND_COLOR)
+        self.__navigation_frame.pack(pady=(10, 5))  # Space between the image and buttons
+
+        # Frame for simulated image
+        self.__simulated_image_frame = tk.Frame(self.__images_frame, bg=ResourceManager.BACKGROUND_COLOR)
+        self.__simulated_image_frame.pack(side=tk.LEFT, padx=10, fill="both", expand=True)
+
+        # Placeholder for logos
+        self.__logo_frame = tk.Frame(self.__main_frame, bg=ResourceManager.BACKGROUND_COLOR)
+        self.__logo_frame.grid(row=3, column=0, columnspan=3, pady=20, sticky="ew")
+             
+    def __init_labels_and_texts(self):
         # Labels for displaying image data
         self.__image_data_label = tk.Label(self.__image_data_frame, text="Image Data", bg=ResourceManager.BACKGROUND_COLOR, font=(ResourceManager.FONT_FAMILY, ResourceManager.FONT_SIZES["title"]))
         self.__image_data_label.pack(anchor="w")
@@ -108,28 +137,6 @@ class MainWindow(tk.Tk):
         self.__band_current_number_label = tk.Label(self.__image_data_frame, bg=ResourceManager.BACKGROUND_COLOR, font=(ResourceManager.FONT_FAMILY, ResourceManager.FONT_SIZES["normal"]))
         self.__band_current_number_label.pack(anchor="w")
 
-        # Controls section for importing images and generating simulations
-        self.__controls_frame = tk.Frame(self.__main_frame, bg=ResourceManager.BACKGROUND_COLOR)
-        self.__controls_frame.grid(row=1, column=0, padx=20, pady=20, sticky="nw")
-
-        self.__import_btn = ttk.Button(self.__controls_frame, text="Import an image", command=self.__import_image)
-        self.__import_btn.pack(pady=10)
-
-        self.__sim_btn = ttk.Button(self.__controls_frame, text="Generate a color image", command=self.__open_simulation_choice, state='disabled')
-        self.__sim_btn.pack(pady=10)
-
-        # Image Display Section
-        self.__image_display_frame = tk.Frame(self.__main_frame, bg=ResourceManager.BACKGROUND_COLOR)
-        self.__image_display_frame.grid(row=0, column=1, rowspan=2, padx=20, pady=20, sticky="nsew")
-
-        # Frame to hold both imported and simulated images side by side
-        self.__images_frame = tk.Frame(self.__image_display_frame, bg=ResourceManager.BACKGROUND_COLOR)
-        self.__images_frame.pack(pady=(0, 5), fill="both", expand=True)
-
-        # Frame for imported image
-        self.__imported_image_frame = tk.Frame(self.__images_frame, bg=ResourceManager.BACKGROUND_COLOR)
-        self.__imported_image_frame.pack(side=tk.LEFT, padx=10, fill="both", expand=True)
-
         # Label for the current band wavelength
         self.__band_wavelength_label = tk.Label(self.__imported_image_frame, bg=ResourceManager.BACKGROUND_COLOR, font=(ResourceManager.FONT_FAMILY, ResourceManager.FONT_SIZES["normal"]))
         self.__band_wavelength_label.pack(pady=(5, 5))  # Space below the label
@@ -142,43 +149,15 @@ class MainWindow(tk.Tk):
         self.__image_label = tk.Label(self.__imported_image_frame, bg=ResourceManager.BACKGROUND_COLOR)
         self.__image_label.pack(padx=10, pady=10)
 
-        # Frame for navigation buttons (Previous/Next)
-        self.__navigation_frame = tk.Frame(self.__imported_image_frame, bg=ResourceManager.BACKGROUND_COLOR)
-        self.__navigation_frame.pack(pady=(10, 5))  # Space between the image and buttons
-
-        # Previous/Next buttons for band navigation
-        self.__prev_btn = ttk.Button(self.__navigation_frame, text="Previous", command=self.__previous_band, state='disabled')  # Set to disabled initially
-        self.__prev_btn.pack(side=tk.LEFT, padx=10)
-
-        # Label and buttons for Current "Band Number"
-        self.__band_current_number_text = tk.Text(self.__navigation_frame, bg=ResourceManager.BACKGROUND_COLOR, font=(ResourceManager.FONT_FAMILY, ResourceManager.FONT_SIZES["normal"]),width=3,height=1, state="disabled")
-        self.__band_current_number_text.pack(side=tk.LEFT, padx=10)
-        self.__band_total_number_label = tk.Label(self.__navigation_frame, bg=ResourceManager.BACKGROUND_COLOR, font=(ResourceManager.FONT_FAMILY, ResourceManager.FONT_SIZES["normal"]))
-        self.__band_total_number_label.pack(side=tk.LEFT, padx=10)  
-
-        self.__next_btn = ttk.Button(self.__navigation_frame, text="Next", command=self.__next_band, state='disabled')  # Set to disabled initially
-        self.__next_btn.pack(side=tk.LEFT, padx=10)
-
-        # Frame for simulated image
-        self.__simulated_image_frame = tk.Frame(self.__images_frame, bg=ResourceManager.BACKGROUND_COLOR)
-        self.__simulated_image_frame.pack(side=tk.LEFT, padx=10, fill="both", expand=True)
-
         # Label for "Simulated Image"
         self.__simulated_image_label = tk.Label(self.__simulated_image_frame, bg=ResourceManager.BACKGROUND_COLOR, text="Simulated Image", font=(ResourceManager.FONT_FAMILY, ResourceManager.FONT_SIZES["title"]))
         self.__simulated_image_label.pack(pady=(30, 5))  # Space above and below the label
 
         # Image label for simulated image
         self.__image_sim_label = tk.Label(self.__simulated_image_frame, bg=ResourceManager.BACKGROUND_COLOR)
-        self.__image_sim_label.pack(padx=10, pady=(10, 0))  # Add padding above the generated image
+        self.__image_sim_label.pack(padx=10, pady=(10, 0))  # Add padding above the generated image 
 
-        # Save Button
-        self.__save_btn = ttk.Button(self.__simulated_image_frame, text="Save", command=self.__save_simulated_image, state='disabled')
-        self.__save_btn.pack(pady=20)  # Place the button under the simulated image
-
-        # Placeholder for logos
-        self.__logo_frame = tk.Frame(self.__main_frame, bg=ResourceManager.BACKGROUND_COLOR)
-        self.__logo_frame.grid(row=3, column=0, columnspan=3, pady=20, sticky="ew")
-
+    def __init_logos(self) : 
         # Left logo placeholder
         self.__left_logo_image = self.__load_image(ResourceManager.IUT_LOGO, size=ResourceManager.LOGO_SIZE)  # Store the image with size 300x160
         self.__left_logo = tk.Label(self.__logo_frame, image=self.__left_logo_image, bg=ResourceManager.BACKGROUND_COLOR)
@@ -188,7 +167,33 @@ class MainWindow(tk.Tk):
         self.__right_logo_image = self.__load_image(ResourceManager.IMVIA_LOGO, size=ResourceManager.LOGO_SIZE)  # Store the image with size 300x160
         self.__right_logo = tk.Label(self.__logo_frame, image=self.__right_logo_image, bg=ResourceManager.BACKGROUND_COLOR)
         self.__right_logo.pack(side=tk.RIGHT, padx=(10, 100))
+
+    def __init_controls(self) : 
+        # Importing image button
+        self.__import_btn = ttk.Button(self.__controls_frame, text="Import an image", command=self.__import_image)
+        self.__import_btn.pack(pady=10)
+
+        # Simulation button
+        self.__sim_btn = ttk.Button(self.__controls_frame, text="Generate a color image", command=self.__open_simulation_choice, state='disabled')
+        self.__sim_btn.pack(pady=10)
+
+        # Previous/Next buttons for band navigation
+        self.__prev_btn = ttk.Button(self.__navigation_frame, text="Previous", command=self.__previous_band, state='disabled')  # Set to disabled initially
+        self.__prev_btn.pack(side=tk.LEFT, padx=10)
         
+        # Label and buttons for Current "Band Number"
+        self.__band_current_number_text = tk.Text(self.__navigation_frame, bg=ResourceManager.BACKGROUND_COLOR, font=(ResourceManager.FONT_FAMILY, ResourceManager.FONT_SIZES["normal"]),width=3,height=1, state="disabled")
+        self.__band_current_number_text.pack(side=tk.LEFT, padx=10)
+        self.__band_total_number_label = tk.Label(self.__navigation_frame, bg=ResourceManager.BACKGROUND_COLOR, font=(ResourceManager.FONT_FAMILY, ResourceManager.FONT_SIZES["normal"]))
+        self.__band_total_number_label.pack(side=tk.LEFT, padx=10) 
+        
+        self.__next_btn = ttk.Button(self.__navigation_frame, text="Next", command=self.__next_band, state='disabled')  # Set to disabled initially
+        self.__next_btn.pack(side=tk.LEFT, padx=10)
+
+        # Save Button
+        self.__save_btn = ttk.Button(self.__simulated_image_frame, text="Save", command=self.__save_simulated_image, state='disabled')
+        self.__save_btn.pack(pady=20)  # Place the button under the simulated image
+
     def __display_default_image(self):
         png_path = ResourceManager.DEFAULT_IMAGE
         image = Image.open(png_path)
