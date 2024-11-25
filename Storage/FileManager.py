@@ -6,18 +6,13 @@ from Storage.ImageManager import ImageManager
 from LogicLayer.ImageMS import ImageMS
 from Exceptions.MetaDataNotFoundException import MetaDataNotFoundException
 from Exceptions.ErrorMessages import ErrorMessages
+from ResourceManager import ResourceManager
 
 
 class FileManager : 
     """
     Class FileManager which allow to save or load a multispectral image
     """
-    SHADE_OF_GREY : chr = 'F' # An image in a shade of grey, so an 8 bits image
-    IMAGE_16BIT : chr = 'I;16'
-    NUMBER_TO_CONVERT_TO_8BITS : int = 256 
-    MAX_COLOR_BITS : int = 255
-    WAVELENGTH_LABEL : str = "Center wavelengths:"
-    TABULATION_SYMBOL : chr = '\t\t'
 
     def __init__(self) : 
         """
@@ -38,7 +33,7 @@ class FileManager :
         if not path.lower().endswith(('.tif', '.png', '.jpg', '.jpeg')):
             path += '.tif'
         
-        image_to_save = Image.fromarray((image * FileManager.MAX_COLOR_BITS).astype(np.uint8))
+        image_to_save = Image.fromarray((image * ResourceManager.MAX_COLOR_BITS).astype(np.uint8))
         image_to_save.save(path)
 
     @staticmethod
@@ -82,10 +77,10 @@ class FileManager :
                 if (f"{image_name}:" in line) : 
                     image_name_found = True
                     continue
-                if ((image_name_found) and (FileManager.WAVELENGTH_LABEL in line)) :
+                if ((image_name_found) and (ResourceManager.WAVELENGTH_LABEL in line)) :
                     wavelengths_found = True 
                     continue
-                if ((wavelengths_found) and (line.strip()) and (line.startswith(FileManager.TABULATION_SYMBOL))) : 
+                if ((wavelengths_found) and (line.strip()) and (line.startswith(ResourceManager.TABULATION_SYMBOL))) : 
                     values = [float(val) for val in line.strip().split()]
                     wavelengths.extend(values)
             if (len(wavelengths) == 0): # If none of the data were found we raise an exception
@@ -108,10 +103,10 @@ class FileManager :
                 image.seek(num_band)
                 band_shade = np.array(image)
                 match image.mode : 
-                    case FileManager.SHADE_OF_GREY : 
-                        band_shade = np.array(image)*FileManager.MAX_COLOR_BITS
-                    case FileManager.IMAGE_16BIT : 
-                        band_shade = np.array(image)/FileManager.NUMBER_TO_CONVERT_TO_8BITS
+                    case ResourceManager.SHADE_OF_GREY : 
+                        band_shade = np.array(image)*ResourceManager.MAX_COLOR_BITS
+                    case ResourceManager.IMAGE_16BIT : 
+                        band_shade = np.array(image)/ResourceManager.NUMBER_TO_CONVERT_TO_8BITS
                 # Use num_band - 1 to align with wavelengths array
                 wavelength_index = num_band - 1
                 band = ImageManager.create_band_instance([
