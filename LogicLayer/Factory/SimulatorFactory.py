@@ -1,6 +1,7 @@
 from typing import Dict, List
 
 from LogicLayer.Factory.CreateSimulating.ICreateSimulator import ICreateSimulator
+from LogicLayer.ImageMS import ImageMS
 
 class SimulatorFactory:
     """
@@ -42,7 +43,7 @@ class SimulatorFactory:
         """
         return list(self.__builders.keys())
 
-    def create(self, simulation_type, image_ms, bands, **kwargs):
+    def create(self, simulation_type : str, image_ms : ImageMS, bands : tuple, **kwargs):
         """
         Creates a simulator using the registered constructor for the given name.
         

@@ -5,13 +5,8 @@ class BeeSimulating(SimulateMethod):
     def __init__(self, image_ms):
         super().__init__(image_ms)
         # Coefficients based on Peitsch et al. (1992)
-        self.__color_balance = {
-            'UV': 1.0,    # Peak at 344nm
-            'Blue': 1.0,  # Peak at 436nm
-            'Green': 1.0  # Peak at 544nm
-        }
 
-    def __calculate_photoreceptor_sensitivity(self, wavelength):
+    def calculate_sensitivity(self, wavelength : float) -> tuple :
         """
         Calculate the sensitivity of bee photoreceptors based on:
         - Menzel & Backhaus (1991): Colour vision in insects
@@ -29,9 +24,9 @@ class BeeSimulating(SimulateMethod):
             tuple: Sensitivities (UV, Blue, Green) normalized
         """
         # Sensitivity based on Peitsch et al. (1992)
-        UV = np.exp(-((wavelength - 344)**2) / (2 * 26**2)) * self.__color_balance['UV']
-        Blue = np.exp(-((wavelength - 436)**2) / (2 * 34**2)) * self.__color_balance['Blue']
-        Green = np.exp(-((wavelength - 544)**2) / (2 * 43**2)) * self.__color_balance['Green']
+        UV = np.exp(-((wavelength - 344)**2) / (2 * 26**2)) * self._color_balance['R']
+        Blue = np.exp(-((wavelength - 436)**2) / (2 * 34**2)) * self._color_balance['B']
+        Green = np.exp(-((wavelength - 544)**2) / (2 * 43**2)) * self._color_balance['G']
         
         # Relative normalization
         total = UV + Blue + Green
@@ -59,7 +54,7 @@ class BeeSimulating(SimulateMethod):
         for band in self._image_ms.get_bands():
             band_data = band.get_shade_of_grey().astype(float)
             wavelength = band.get_wavelength()[0]
-            UV, Blue, Green = self.__calculate_photoreceptor_sensitivity(wavelength)
+            UV, Blue, Green = self.calculate_sensitivity(wavelength)
             
             # Representation in RGB:
             # UV -> Blue channel (for visualization)

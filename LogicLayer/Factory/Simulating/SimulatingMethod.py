@@ -15,6 +15,12 @@ class SimulateMethod(ABC):
             image_ms (ImageMS): An ImageMS object representing the multispectral image to simulate.
         """
         self._image_ms = image_ms
+        # Coefficient based on CIE 1931 color matching functions
+        self._color_balance = {
+            'R': 1.0,
+            'G': 1.0,
+            'B': 1.0
+        }
 
     @abstractmethod
     def simulate(self) -> np.ndarray:
@@ -25,3 +31,7 @@ class SimulateMethod(ABC):
             The simulated image data as an ndarray.
         """
         pass
+    
+    @abstractmethod
+    def calculate_sensitivity(self, wavelength : float) -> tuple :
+        pass  

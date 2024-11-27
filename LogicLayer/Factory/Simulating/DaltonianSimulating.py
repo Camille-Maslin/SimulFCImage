@@ -5,23 +5,23 @@ class DaltonianSimulating(SimulateMethod):
     def __init__(self, image_ms, daltonian_type="Deuteranopia"):
         super().__init__(image_ms)
         self.__daltonian_type = daltonian_type
-        self.__color_balance = {
-            'R': 1.0,
-            'G': 1.0,
-            'B': 1.0
-        }
 
-    def __calculate_cone_sensitivity(self, wavelength):
+    def calculate_sensitivity(self, wavelength : float) -> tuple :
         """
         Calculation of cone sensitivity based on:
         - Brettel et al. (1997) for dichromatic vision
         - Machado et al. (2009) for anomalous trichromatic vision
         - Carroll et al. (2004) for severity ratios
+
+        Args:
+            wavelength (float): Wavelength in nanometers
+            
+        @returns: tuple Sensitivities (Blue, Green, Red) 
         """
         # Base sensitivities (using Stockman & Sharpe 2000 peaks)
-        S = np.exp(-((wavelength - 441.8)**2) / (2 * 28**2)) * self.__color_balance['B']
-        M = np.exp(-((wavelength - 541.2)**2) / (2 * 38**2)) * self.__color_balance['G']
-        L = np.exp(-((wavelength - 566.8)**2) / (2 * 48**2)) * self.__color_balance['R']
+        S = np.exp(-((wavelength - 441.8)**2) / (2 * 28**2)) * self._color_balance['B']
+        M = np.exp(-((wavelength - 541.2)**2) / (2 * 38**2)) * self._color_balance['G']
+        L = np.exp(-((wavelength - 566.8)**2) / (2 * 48**2)) * self._color_balance['R']
 
         if self.__daltonian_type == "Deuteranopia":
             # Complete absence of M cones
@@ -75,7 +75,7 @@ class DaltonianSimulating(SimulateMethod):
         for band in self._image_ms.get_bands():
             band_data = band.get_shade_of_grey().astype(float) / 255.0
             wavelength = band.get_wavelength()[0]
-            S, M, L = self.__calculate_cone_sensitivity(wavelength)
+            S, M, L = self.calculate_sensitivity(wavelength)
             
             rgb_image[:,:,2] += band_data * S  # Blue
             rgb_image[:,:,1] += band_data * M  # Green

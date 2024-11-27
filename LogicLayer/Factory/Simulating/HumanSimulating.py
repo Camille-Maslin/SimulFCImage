@@ -4,14 +4,8 @@ import numpy as np
 class HumanSimulating(SimulateMethod):
     def __init__(self, image_ms):
         super().__init__(image_ms)
-        # Coefficient based on CIE 1931 color matching functions
-        self.__color_balance = {
-            'R': 1.0,
-            'G': 1.0,
-            'B': 1.0
-        }
 
-    def __calculate_cone_sensitivity(self, wavelength):
+    def calculate_sensitivity(self, wavelength : float) -> tuple :
         """
         Calculate the sensitivity of the three types of cones based on CIE 1931 color matching functions
         and Stockman & Sharpe (2000) cone fundamentals.
@@ -35,15 +29,17 @@ class HumanSimulating(SimulateMethod):
         Stockman, A., & Sharpe, L. T. (2000). The spectral sensitivities of the middle- 
         and long-wavelength-sensitive cones derived from measurements in observers of 
         known genotype. Vision Research, 40(13), 1711-1737
+
+        @returns: tuple Sensitivities (Blue, Green, Red) 
         """
         # S-cones (blue) - peak at 441.8nm
-        S = np.exp(-((wavelength - 441.8)**2) / (2 * 28**2)) * self.__color_balance['B']
+        S = np.exp(-((wavelength - 441.8)**2) / (2 * 28**2)) * self._color_balance['B']
         
         # M-cones (green) - peak at 541.2nm
-        M = np.exp(-((wavelength - 541.2)**2) / (2 * 38**2)) * self.__color_balance['G']
+        M = np.exp(-((wavelength - 541.2)**2) / (2 * 38**2)) * self._color_balance['G']
         
         # L-cones (red) - peak at 566.8nm
-        L = np.exp(-((wavelength - 566.8)**2) / (2 * 48**2)) * self.__color_balance['R']
+        L = np.exp(-((wavelength - 566.8)**2) / (2 * 48**2)) * self._color_balance['R']
         
         # Relative normalization to maintain color balance
         total = S + M + L
@@ -64,7 +60,7 @@ class HumanSimulating(SimulateMethod):
         for band in self._image_ms.get_bands():
             band_data = band.get_shade_of_grey().astype(float)
             wavelength = band.get_wavelength()[0]
-            S, M, L = self.__calculate_cone_sensitivity(wavelength)
+            S, M, L = self.calculate_sensitivity(wavelength)
             
             rgb_image[:,:,0] += band_data * L
             rgb_image[:,:,1] += band_data * M

@@ -29,10 +29,6 @@ class FileManager :
             - path (str) : the path to save the image
         Author : Lakhdar Gibril
         """
-        # If the path does not contain an extension, add .tif by default
-        if not path.lower().endswith(('.tif', '.png', '.jpg', '.jpeg')):
-            path += '.tif'
-        
         image_to_save = Image.fromarray((image * ResourceManager.MAX_COLOR_BITS).astype(np.uint8))
         image_to_save.save(path)
 
