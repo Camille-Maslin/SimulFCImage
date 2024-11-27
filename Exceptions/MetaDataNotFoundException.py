@@ -1,4 +1,6 @@
-class MetaDataNotFoundException(Exception) : 
+from Exceptions.BaseException import BaseException
+
+class MetaDataNotFoundException(BaseException) : 
     """
     Exception which is raised when a data in a metadata .txt file is not found or does not exist
     Author : Lakhdar Gibril
@@ -11,13 +13,5 @@ class MetaDataNotFoundException(Exception) :
             - message (str) : a string of the error message 
         Author : Lakhdar Gibril     
         """
-        super().__init__() # Calling the parent constructor
-        self.__message = message
+        super().__init__(message)
     
-    def __str__(self) -> str : 
-        """
-        Method __str__() which allow to display the exception message
-        @return : str 
-        Author : Lakhdar Gibril
-        """
-        return self.__message

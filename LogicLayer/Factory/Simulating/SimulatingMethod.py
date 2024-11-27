@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
-from LogicLayer import ImageMS
 import numpy as np
+
+from LogicLayer import ImageMS
 
 class SimulateMethod(ABC):
     """
