@@ -49,23 +49,18 @@ class TestFileManager(unittest.TestCase):
         self.assertEqual(image_ms.get_path(), self.test_image_path)
         self.assertGreater(len(image_ms.get_bands()), 0)
 
-    def test_save_simulation(self):
-        """Test saving a simulated RGB image from actual multispectral data"""
-        # Load the multispectral image
-        image_ms = FileManager.Load(self.test_image_path, self.test_metadata_path)
-        
-        # Simulate a selection of RGB bands (for example, take the first 3 bands)
-        bands = image_ms.get_bands()[:3]  # Take the first 3 bands
-        
-        # Create an RGB image from the selected bands
-        rgb_image = np.zeros((image_ms.get_size()[1], image_ms.get_size()[0], 3), dtype=np.uint8)
-        for i, band in enumerate(bands):
-            rgb_image[:,:,i] = band.get_shade_of_grey()
+    def test_convert_to_image_and_save(self):
+        """
+        Test the convert_to_image_and_save method 
+        """
+        # Create a test normalized numpy array image 
+        test_image = np.random.rand(100, 100, 3)
         
         print("\nSelect the save location for the test image...")
         test_save_path = filedialog.asksaveasfilename(
-            defaultextension=".png",
-            filetypes=[("PNG files", "*.png"), ("All files", "*.*")],
+            defaultextension=".tif",
+            filetypes=[("TIF files", "*.tif"), ("PNG files", "*.png"), 
+                    ("JPEG files", "*.jpg"), ("All files", "*.*")],
             title="Save the test image"
         )
         
@@ -73,24 +68,24 @@ class TestFileManager(unittest.TestCase):
             self.skipTest("Test cancelled - No save location selected")
         
         try:
-            # Save the image directly without mock
-            FileManager.Save(rgb_image)
+            # Call the convert_to_image_and_save method
+            FileManager.convert_to_image_and_save(test_image, test_save_path)
             
             # Verify that the file has been created
             self.assertTrue(os.path.exists(test_save_path))
             
-            # Load and verify the saved image
+            # Load the saved image
             saved_image = np.array(Image.open(test_save_path))
             
             # Verify the dimensions
-            self.assertEqual(saved_image.shape, rgb_image.shape)
+            self.assertEqual(saved_image.shape, test_image.shape)
+            
+            # Verify the saved image is uint8
+            self.assertEqual(saved_image.dtype, np.uint8)
             
             # Verify that the image contains valid data
             self.assertTrue(np.any(saved_image > 0))  # Check that there are non-zero pixels
             self.assertTrue(np.all(saved_image <= 255))  # Check that the values are in the valid range
-            
-            # Verify that the saved image corresponds to the original image
-            np.testing.assert_array_almost_equal(saved_image, rgb_image)
             
             print(f"\nTest image saved successfully to: {test_save_path}")
             
