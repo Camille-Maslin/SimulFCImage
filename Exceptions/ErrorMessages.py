@@ -1,6 +1,9 @@
 
 class ErrorMessages:
-    
+    """
+    Class which contains as constants all errors messages for the application
+    Author : Alexandre Moreau
+    """
     METADATA_REQUIRED = "Metadata file is required. Import cancelled."
     IMAGE_REQUIRED = "Image file is required. Import cancelled."
     UNSUPPORTED_FORMAT = "Unsupported image format."
