@@ -38,3 +38,6 @@ class BandChoiceSimulating(SimulateMethod):
         rgb_image = np.dstack((red_normalized, green_normalized, blue_normalized))
         
         return rgb_image
+    
+    def calculate_sensitivity(self, wavelength : float) -> tuple :
+        pass 
