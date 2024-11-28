@@ -1,8 +1,19 @@
 from LogicLayer.Factory.Simulating.SimulatingMethod import SimulateMethod
 import numpy as np
+from LogicLayer.ImageMS import ImageMS
 
 class DaltonianSimulating(SimulateMethod):
-    def __init__(self, image_ms, daltonian_type="Deuteranopia"):
+    """
+    Class which inherit of SimulateMethod class, this one allow to simulate the vision of a Daltonian person
+    """
+
+    def __init__(self, image_ms : ImageMS, daltonian_type : str = "Deuteranopia"):
+        """
+        Constructor of DaltonianSimulating which call the constructor of SimulateMethod.
+        Args : 
+            - image_ms (ImageMS) : the ImageMS object to get the bands data and simulate 
+            - daltonian_type (str) : per default it is Deuteranopia, but it is useful for the sensitivity to calculate for the simulation. 
+        """
         super().__init__(image_ms)
         self.__daltonian_type = daltonian_type
 
@@ -23,10 +34,12 @@ class DaltonianSimulating(SimulateMethod):
         M = np.exp(-((wavelength - 541.2)**2) / (2 * 38**2)) * self._color_balance['G']
         L = np.exp(-((wavelength - 566.8)**2) / (2 * 48**2)) * self._color_balance['R']
 
+        severity = 0.75  # 75% severity is more common
+
         if self.__daltonian_type == "Deuteranopia":
             # Complete absence of M cones
             # Brettel ratio: 1.0L + 0.0M + 0.0S for λ > 545nm
-            #                0.0L + 0.0M + 1.0S for λ < 545nm
+            # 0.0L + 0.0M + 1.0S for λ < 545nm
             M = 0.95 * L + 0.05 * S if wavelength > 545 else 0.05 * L + 0.95 * S
 
         elif self.__daltonian_type == "Protanopia":
@@ -42,24 +55,21 @@ class DaltonianSimulating(SimulateMethod):
 
         elif self.__daltonian_type == "Deuteranomaly":
             # Machado: Partial M cone dysfunction
-            severity = 0.75  # 75% severity is more common
             M = (1 - severity) * M + severity * L
 
         elif self.__daltonian_type == "Protanomaly":
             # Machado: Partial L cone dysfunction
-            severity = 0.75
             L = (1 - severity) * L + severity * M
 
         elif self.__daltonian_type == "Tritanomaly":
             # Machado: Partial S cone dysfunction
-            severity = 0.75
             S = (1 - severity) * S + severity * ((M + L) / 2)
 
-        elif self.__daltonian_type == "Achromatopsia":
+        elif self.__daltonian_type == "Achromatopsia" :
             # Complete color blindness
             # Peak sensitivity of rods at 498nm (Kraft et al. 1993)
             rod_response = np.exp(-((wavelength - 498)**2) / (2 * 35**2))
-            return rod_response, rod_response, rod_response
+            S,M,L = rod_response,rod_response,rod_response
 
         # Relative normalization
         total = S + M + L
