@@ -4,5 +4,5 @@ from LogicLayer import ImageMS
 
 class CreateDaltonianSimulator(ICreateSimulator):
 
-    def create_simulator(self, image_ms : ImageMS, bands_number : tuple = ()):
-        return DaltonianSimulating(image_ms)
+    def create_simulator(self, image_ms : ImageMS, bands_number : tuple = (), **kwargs):
+        return DaltonianSimulating(image_ms, kwargs.get('daltonian_type'))
