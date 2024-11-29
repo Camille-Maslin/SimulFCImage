@@ -54,24 +54,25 @@ pip install Pillow rasterio numpy cx_Freeze
 <h2>Usage Guide</h2>
 
 <h3>Loading Images</h3>
-1. Click "Import an image" <br>
+1. Click "Import an image" on the upper band <br>
 2. Select a multispectral image (.tiff format) <br>
 3. Import the corresponding metadata file (.txt) <br>
 4. Navigate through bands using "Previous" and "Next" buttons
 
-<img src="HMI/assets/MainWindow.png" width="1024"/>
+<img src="HMI/assets/MainWindowLoadSave.png" width="1024"/>
+<img src="HMI/assets/MainWindowSimulation.png" width="1024"/>
 
 <h3>Generating Color Images</h3>
-1. Click "Generate a color image" <br>
+1. Click "Generate a color image" on the upper band <br>
 2. Select a simulation method:
    - True Color (Human Vision)
    - RGB Bands Choice (Custom Mapping)
    - Bee Vision
    - Color Vision Deficiency <br>
 3. Configure method-specific parameters if required <br>
-4. Click "Proceed" to generate the image
+4. Click "Simulate" to generate the image
 
-<img src="HMI/assets/SimulationChoiceWindow.png" width="1024"/>
+<img src="HMI/assets/MainWindowSimulation.png" width="1024"/>
 
 <h3>Results and Export</h3>
 - The generated image appears alongside the original
