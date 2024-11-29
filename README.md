@@ -38,10 +38,9 @@ Provides insights into how bees perceive the multispectral image.</p>
 <h2>Installation Guide</h2>
 
 <h3>Option 1: Pre-compiled Application</h3>
-1. Download SimulFCImage.zip from Google Drive ( https://drive.google.com/drive/folders/1uRv_wMsNEgHqScpr94n4Br1E7VYtcmYx?usp=sharing ) <br>
-2. Extract the ZIP file <br>
-3. Launch SimulFCImage.exe <br>
-4. (Optional) Download sample multispectral images from the "Teeth" folder
+1. Download SimulFCImage setup.exe from Google Drive ( https://drive.google.com/drive/folders/1uRv_wMsNEgHqScpr94n4Br1E7VYtcmYx?usp=sharing ) <br>
+2. Launch SimulFCImage setup.exe <br>
+3. (Optional) Download sample multispectral images from the "Teeth" folder
 
 <h3>Option 2: Building from Source</h3>
 1. Clone the repository <br>
