@@ -47,7 +47,7 @@ Provides insights into how bees perceive the multispectral image.</p>
 2. Install dependencies:
 
 ```bash
-pip install Pillow rasterio numpy cx_Freeze
+pip install Pillow numpy cx_Freeze
 ```
 3. Run Program.py to compile and launch the application
 
