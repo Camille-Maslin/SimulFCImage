@@ -110,5 +110,5 @@ class FileManager :
                             band_shade,
                             (metadata[wavelength_index], metadata[wavelength_index])])
                 bands.append(band)
-            image_ms = ImageManager.create_imagems_instance([image_path, metadata[0], metadata[-1], image.size, bands])
+            image_ms = ImageManager.create_imagems_instance([image_path, metadata[0], metadata[wavelength_index], image.size, bands])
             return image_ms
