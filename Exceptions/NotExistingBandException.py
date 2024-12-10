@@ -1,4 +1,6 @@
-class NotExistingBandException(Exception): 
+from Exceptions.BaseException import BaseException
+
+class NotExistingBandException(BaseException): 
     """
     Exception which is raised when the input value of the band number is nonexistent
     Author : Lakhdar Gibril
@@ -11,13 +13,4 @@ class NotExistingBandException(Exception):
             - message : a string of the error message 
         Author : Lakhdar Gibril     
         """
-        super().__init__() # Calling the parent constructor
-        self.__message = message
-    
-    def __str__(self) -> str : 
-        """
-        Method __str__() which allow to display the exception message
-        @return : str 
-        Author : Lakhdar Gibril
-        """
-        return self.__message
+        super().__init__(message) 
