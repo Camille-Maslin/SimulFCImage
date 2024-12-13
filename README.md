@@ -6,11 +6,23 @@
 <h2>Key Features</h2>
 
 <h3>1. Human Vision Simulation ("True Color")</h3>
-<p>Simulates human color perception based on the CIE 1931 color matching functions and Stockman & Sharpe (2000) cone fundamentals:
-- L-cones (red): peak at 566.8nm
-- M-cones (green): peak at 541.2nm
-- S-cones (blue): peak at 441.8nm
-This provides an accurate representation of how the human eye would perceive the multispectral image.</p>
+<p>Offers two distinct approaches to simulate human color perception:</p>
+
+<h4>Version 1 (Classic):</h4>
+<p>Uses Gaussian approximations to simulate human cone sensitivity:
+- Approximates L, M, S cone responses using Gaussian functions
+- Provides a simplified but efficient approach to color reproduction
+- Suitable for quick visualization where absolute accuracy isn't critical</p>
+
+<h4>Version 2 (Advanced):</h4>
+<p>Based on precise scientific standards:
+- Utilizes CIE 1931 color matching functions
+- References Stockman & Sharpe (2000) cone fundamentals:
+  - L-cones (red): peak at 566.8nm
+  - M-cones (green): peak at 541.2nm
+  - S-cones (blue): peak at 441.8nm
+- Performs spectral interpolation for accurate wavelength matching
+- Implements proper color space transformations</p>
 
 <h3>2. Custom Band Mapping ("False Color")</h3>
 <p>Enables manual assignment of specific spectral bands to RGB channels, allowing users to:
@@ -65,7 +77,7 @@ pip install Pillow numpy cx_Freeze
 <h3>Generating Color Images</h3>
 1. Click "Generate a color image" on the upper band <br>
 2. Select a simulation method:
-   - True Color (Human Vision)
+   - True Color (Human Vision V1 or V2)
    - RGB Bands Choice (Custom Mapping)
    - Bee Vision
    - Color Vision Deficiency <br>
