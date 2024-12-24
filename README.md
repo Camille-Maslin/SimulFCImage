@@ -5,7 +5,7 @@
 
 <h2>Key Features</h2>
 
-<h3>1. Human Vision Simulation ("True Color")</h3>
+<h3>1. Human Vision Simulation</h3>
 <p>Offers two distinct approaches to simulate human color perception:</p>
 
 <h4>Version 1 (Classic):</h4>

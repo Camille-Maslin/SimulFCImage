@@ -11,7 +11,7 @@ from LogicLayer.Band import Band
 class TestBand(unittest.TestCase):
     """
     Test suite for Band class functionalities.
-    Author: Camille Maslin
+    Author: Camille Maslin, Paris Alexis
     """
     def setUp(self):
         """Set up test fixtures"""
@@ -80,10 +80,13 @@ class TestBand(unittest.TestCase):
 
     def test_immutability(self):
         """Test the immutability of the class attributes"""
+        # Make a copy of the original array before modification
         original_shade = self.band.get_shade_of_grey().copy()
-        modified_shade = self.band.get_shade_of_grey()
-        modified_shade[0, 0] = 255
         
+        # Create a separate copy for modification
+        modified_shade = self.band.get_shade_of_grey().copy()
+        modified_shade[0, 0] = 255
+
         # Verify that the modification does not affect the original
         np.testing.assert_array_equal(self.band.get_shade_of_grey(), original_shade)
 

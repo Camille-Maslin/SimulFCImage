@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 from unittest.mock import MagicMock
-from LogicLayer.Factory.Simulating.BandChoiceSimulating import BandChoiceSimulating
+from Factory.Simulating.BandChoiceSimulating import BandChoiceSimulating
 from LogicLayer.ImageMS import ImageMS
 
 class TestBandChoiceSimulating(unittest.TestCase):

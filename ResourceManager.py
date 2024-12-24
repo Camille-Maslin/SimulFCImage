@@ -11,16 +11,18 @@ class ResourceManager :
     TABULATION_SYMBOL : chr = '\t\t'
     
     # Simulations Types 
-    RGB_BANDS : str = "RGB bands choice"
-    TRUE_COLOR : str = "True color simulation"
-    BEE_COLOR : str = "Bee color simulation"
-    DALTONIAN : str = "Daltonian color simulation" 
+    RGB_BANDS : str = "RGB Bands"
+    TRUE_COLOR : str = "Human Vision"
+    BEE_COLOR : str = "Bee Vision"
+    DALTONIAN : str = "Color Blindness" 
+    HUMAN_CONE : str = "Human Cone Vision"
 
     # Paths 
-    ASSETS_PATH : str = "HMI/assets/"
+    ASSETS_PATH = "HMI/assets/"
     DEFAULT_IMAGE : str = f"{ASSETS_PATH}no-image.1024x1024.png"
-    IUT_LOGO : str = f"{ASSETS_PATH}Logo-iut-dijon-auxerre-nevers.png"
-    IMVIA_LOGO : str = f"{ASSETS_PATH}Logo-laboratoire-ImViA.png"
+    IUT_LOGO = f"{ASSETS_PATH}Logo-iut-dijon-auxerre-nevers.png"
+    IMVIA_LOGO = f"{ASSETS_PATH}Logo-laboratoire-ImViA.png"
+    APP_LOGO = f"{ASSETS_PATH}Logo-SimulFCImage.ico"
 
     # Display parameters
     WINDOW_TITLE : str = "SimulFCImage"
@@ -39,3 +41,15 @@ class ResourceManager :
         "normal": 10,
         "button": 10
     }
+
+    # Default directories
+    DEFAULT_IMAGE_DIRECTORY = "Data/Images"  # Ajout du répertoire par défaut pour les images
+
+    # Daltonian Types
+    DEUTERANOPIA = "Deuteranopia"
+    PROTANOPIA = "Protanopia"
+    DEUTERANOMALY = "Deuteranomaly"
+    PROTANOMALY = "Protanomaly"
+    TRITANOPIA = "Tritanopia"
+    TRITANOMALY = "Tritanomaly"
+    ACHROMATOPSIA = "Achromatopsia"

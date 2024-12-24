@@ -67,16 +67,19 @@ class ImageMS (Image.Image) :
         """
         return self.__current
 
-    def set_actualband(self, band_number: int) -> None: 
+    def set_actualband(self, band_number):
         """
-        Setter which allows to set a new actual band of the image
-        args: 
-            - band_number: an integer representing the band number to set as the current band
+        Set the current band by its number
+        Args:
+            band_number: int, the band number to set as current
         """
-        if ((1 > band_number) or (band_number > len(self.__bands))):
-            raise NotExistingBandException(ErrorMessages.INVALID_BAND_NUMBER)
-        else :
-            self.__current = self.__bands[band_number - 1]
+        if isinstance(band_number, int):
+            if 1 <= band_number <= len(self.__bands):
+                self.__current = self.__bands[band_number - 1]
+            else:
+                raise ValueError(f"Band number must be between 1 and {len(self.__bands)}")
+        else:
+            raise TypeError("Band number must be an integer")
 
     def get_bands(self) -> list : 
         """
@@ -138,3 +141,16 @@ class ImageMS (Image.Image) :
             self.__current = self.__bands[current_index - 1]
         else:
             self.__current = self.__bands[-1]
+
+    def get_band_by_number(self, number):
+        """
+        Get a specific band by its number
+        Args:
+            number: band number to find
+        Returns:
+            Band object or None if not found
+        """
+        for band in self.__bands:
+            if band.get_number() == number:
+                return band
+        return None
